@@ -1052,6 +1052,7 @@ def scrape(max_articles: int, start: date, end: date):
 # =============================================================================
 
 def main():
+    global PER_SOURCE_MAX   # declared here so assignment below is valid
     ap = argparse.ArgumentParser(
         description="Bangla News Dataset Scraper v4  —  real / fake (2 labels)"
     )
@@ -1075,7 +1076,6 @@ def main():
 
     # Apply CLI per_source override to all sources
     if args.per_source is not None:
-        global PER_SOURCE_MAX
         PER_SOURCE_MAX = args.per_source
         for src in SOURCES:
             src["max"] = args.per_source
