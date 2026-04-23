@@ -67,9 +67,15 @@ DEFAULT_START    = date(2025, 1, 1)
 DEFAULT_END      = date.today()
 
 # Daily / per-run article limit
-DEFAULT_MAX      = 300
+DEFAULT_MAX      = 350
 BATCH_SAVE_EVERY = 10           # flush to CSV every N articles
 MIN_WORD_COUNT   = 50           # earki articles can be shorter (humor/satire)
+
+# ── Per-source cap ────────────────────────────────────────────────────────────
+# Each source collects AT MOST this many articles per run.
+# Override per-source by setting "max" in the SOURCES entry.
+# Set to None to disable (collect as many as available).
+PER_SOURCE_MAX   = 300          # default: 300 per source
 
 # Sitemap sampling
 SITEMAP_DAYS_SAMPLE = 45        # how many recent daily sitemaps to walk per source
@@ -97,6 +103,7 @@ SOURCES = [
         "category":     "national",
         "sitemap_base": "https://www.prothomalo.com/sitemap/sitemap-daily-{date}.xml",
         "urls":         [],
+        "max":          350,    # collect at most 300 from this source
     },
     {
         "name":         "Samakal",
@@ -105,22 +112,7 @@ SOURCES = [
         "category":     "national",
         "sitemap_base": "https://samakal.com/sitemap/sitemap-daily-{date}.xml",
         "urls":         [],
-    },
-    {
-        "name":         "Naya Diganta",
-        "label":        "real",
-        "parser":       "generic_news",
-        "category":     "national",
-        "sitemap_base": "https://dailynayadiganta.com/sitemap/{date}.xml",
-        "urls":         [],
-    },
-    {
-        "name":         "BD Pratidin",
-        "label":        "real",
-        "parser":       "bd_pratidin",
-        "category":     "national",
-        "sitemap_base": "https://www.bd-pratidin.com/daily-sitemap/{date}/sitemap.xml",
-        "urls":         [],
+        "max":          350,
     },
 
     # ── REAL NEWS (category-page-based) ──────────────────────────────────────
@@ -130,6 +122,7 @@ SOURCES = [
         "parser":       "jugantor",
         "category":     "national",
         "sitemap_base": None,
+        "max":          350,
         "urls": [
             "https://www.jugantor.com/national",
             "https://www.jugantor.com/politics",
@@ -138,41 +131,16 @@ SOURCES = [
         ],
     },
     {
-        "name":         "Ittefaq",
-        "label":        "real",
-        "parser":       "ittefaq",
-        "category":     "national",
-        "sitemap_base": None,
-        "urls": [
-            "https://www.ittefaq.com.bd/national",
-            "https://www.ittefaq.com.bd/politics",
-            "https://www.ittefaq.com.bd/world-news",
-            "https://www.ittefaq.com.bd/business",
-        ],
-    },
-    {
         "name":         "Amar Desh",
         "label":        "real",
         "parser":       "generic_news",
         "category":     "national",
         "sitemap_base": None,
+        "max":          350,
         "urls": [
             "https://www.dailyamardesh.com/national",
             "https://www.dailyamardesh.com/politics",
             "https://www.dailyamardesh.com/business",
-        ],
-    },
-    {
-        "name":         "Shomoyeralo",
-        "label":        "real",
-        "parser":       "shomoyeralo",
-        "category":     "national",
-        "sitemap_base": None,
-        "urls": [
-            "https://www.shomoyeralo.com/menu/102",   # national
-            "https://www.shomoyeralo.com/menu/115",   # politics
-            "https://www.shomoyeralo.com/menu/116",   # international
-            "https://www.shomoyeralo.com/menu/130",   # economy
         ],
     },
     {
@@ -181,6 +149,7 @@ SOURCES = [
         "parser":       "generic_news",
         "category":     "national",
         "sitemap_base": None,
+        "max":          350,
         "urls": [
             "https://dailyinqilab.com/national",
             "https://dailyinqilab.com/politics",
@@ -193,6 +162,7 @@ SOURCES = [
         "parser":       "generic_news",
         "category":     "business",
         "sitemap_base": None,
+        "max":          350,
         "urls": [
             "https://bonikbarta.com/economy",
             "https://bonikbarta.com/stock",
@@ -202,12 +172,14 @@ SOURCES = [
 
     # ── FAKE NEWS SOURCE: earki.co (Bangla satire / parody / humor site) ─────
     # All content here is intentionally fictional / satirical — label = fake
+    # Each section has its own max — 4 × 300 = 1,200 total from earki
     {
         "name":         "Earki Humor",
         "label":        "fake",
         "parser":       "earki",
         "category":     "humor",
         "sitemap_base": None,
+        "max":          300,
         "urls": [
             "https://www.earki.co/humor",
         ],
@@ -218,6 +190,7 @@ SOURCES = [
         "parser":       "earki",
         "category":     "satire",
         "sitemap_base": None,
+        "max":          300,
         "urls": [
             "https://www.earki.co/satire",
         ],
@@ -228,6 +201,7 @@ SOURCES = [
         "parser":       "earki",
         "category":     "fake-news",
         "sitemap_base": None,
+        "max":          300,
         "urls": [
             "https://www.earki.co/news",
         ],
@@ -238,6 +212,7 @@ SOURCES = [
         "parser":       "earki",
         "category":     "fake-interview",
         "sitemap_base": None,
+        "max":          300,
         "urls": [
             "https://www.earki.co/interview",
         ],
@@ -920,7 +895,13 @@ def scrape(max_articles: int, start: date, end: date):
 
     # ── Build one lazy generator per active source ─────────────────────────
     generators = [
-        {"source": src, "gen": get_urls_for_source(src, start, end), "active": True}
+        {
+            "source": src,
+            "gen":    get_urls_for_source(src, start, end),
+            "active": True,
+            # per-source cap: use source["max"] if set, else global PER_SOURCE_MAX
+            "cap":    src.get("max", PER_SOURCE_MAX),
+        }
         for src in active_sources
     ]
 
@@ -1007,6 +988,16 @@ def scrape(max_articles: int, start: date, end: date):
         source_counts[src["name"]] = source_counts.get(src["name"], 0) + 1
         log.info(f"  [{total_new}/{max_articles}] ({src['label']}) [{src['name']}] {title[:60]}...")
 
+        # ── Per-source cap enforcement ────────────────────────────────────────
+        # Find this source's generator and deactivate if cap reached
+        src_cap = next((g["cap"] for g in generators if g["source"] is src), None)
+        if src_cap is not None and source_counts[src["name"]] >= src_cap:
+            for g in generators:
+                if g["source"] is src:
+                    g["active"] = False
+                    log.info(f"  ✋ [{src['name']}] cap of {src_cap} reached — moving on")
+                    break
+
         # Batch save
         if len(collected) >= BATCH_SAVE_EVERY:
             append_to_csv(collected)
@@ -1066,6 +1057,8 @@ def main():
     )
     ap.add_argument("--max_articles", type=int, default=DEFAULT_MAX,
                     help=f"Max articles per run (default {DEFAULT_MAX})")
+    ap.add_argument("--per_source", type=int, default=None,
+                    help=f"Override per-source cap for ALL sources (default: use each source's own max, fallback {PER_SOURCE_MAX})")
     ap.add_argument("--start_date", type=str, default=str(DEFAULT_START),
                     help=f"Start date YYYY-MM-DD (default {DEFAULT_START})")
     ap.add_argument("--end_date", type=str, default=str(DEFAULT_END),
@@ -1079,6 +1072,14 @@ def main():
             if os.path.exists(f):
                 os.remove(f)
                 log.info(f"  🗑  Deleted {f}")
+
+    # Apply CLI per_source override to all sources
+    if args.per_source is not None:
+        global PER_SOURCE_MAX
+        PER_SOURCE_MAX = args.per_source
+        for src in SOURCES:
+            src["max"] = args.per_source
+        log.info(f"  Per-source cap overridden to {args.per_source} for ALL sources")
 
     try:
         start = date.fromisoformat(args.start_date)

@@ -1,0 +1,36 @@
+# ── Data files (can be large, don't upload to GitHub) ─────────────────────────
+news_dataset.csv
+merged_final.csv
+*.csv
+
+# ── Scraper state & logs (auto-generated, not needed on GitHub) ───────────────
+visited_urls.txt
+youtube_visited.txt
+last_run_state.json
+scraper.log
+youtube_scraper.log
+*.log
+*.json
+
+# ── Python cache ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.pyc
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+.env/
+
+# ── OS files ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE files ─────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.code-workspace

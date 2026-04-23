@@ -12,287 +12,285 @@ Web_Scraping/
 │
 ├── scraper.py           ← Collects text from news WEBSITES
 ├── youtube_scraper.py   ← Collects info from YouTube CHANNELS
-├── requirements.txt     ← List of tools Python needs to install
-├── README.md            ← This guide file
+├── merge.py             ← Merges two CSV files from you + friend
+├── requirements.txt     ← List of Python packages needed
+├── .gitignore           ← Tells GitHub what NOT to upload
+└── README.md            ← This guide
 │
-│── The files below are AUTO-CREATED when you run the scripts:
-├── news_dataset.csv     ← Your final collected data (the important one!)
-├── visited_urls.txt     ← Remembers which websites were already collected
-├── youtube_visited.txt  ← Remembers which YouTube videos were already collected
+│   The files below are AUTO-CREATED when you run the scripts:
+│   (They are NOT uploaded to GitHub — see .gitignore)
+│
+├── news_dataset.csv     ← Your final collected data ⭐
+├── visited_urls.txt     ← Remembers which news articles were collected
+├── youtube_visited.txt  ← Remembers which YouTube videos were collected
 ├── last_run_state.json  ← Remembers scraping progress
-├── scraper.log          ← Activity log of news scraper
-└── youtube_scraper.log  ← Activity log of YouTube scraper
+├── scraper.log          ← News scraper activity log
+└── youtube_scraper.log  ← YouTube scraper activity log
 ```
 
-> ✅ You only need to touch: `scraper.py`, `youtube_scraper.py`
-> Everything else is created automatically.
+> ✅ You only ever edit: `scraper.py` and `youtube_scraper.py`
+> Everything else is created automatically when you run the scripts.
 
 ---
 
-## 🖥️ STEP 1 — Install Python (Skip if already installed)
+## 📊 CSV Output Format
 
+Both scripts write to the **same file** `news_dataset.csv`:
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| `id` | Auto number | 1, 2, 3... |
+| `title` | Headline / Video title | "বাংলাদেশে ভূমিকম্প" |
+| `text` | Article body / Video description | "আজ সকালে..." |
+| `source` | Website / Channel name | "Prothom Alo" |
+| `publish_date` | Publication date | 2024-03-15 |
+| `category` | Content type | national, satire, news |
+| `label` | **real** or **fake** | fake |
+| `url` | Original link | https://... |
+| `content_hash` | Duplicate fingerprint | a3f9c1b2... |
+
+---
+
+## ⚙️ How Much Data Will It Collect?
+
+**News Scraper (scraper.py)** — balanced, 300 per source:
+
+| Source | Label | Max |
+|--------|-------|-----|
+| Prothom Alo | real | 300 |
+| Samakal | real | 300 |
+| Naya Diganta | real | 300 |
+| BD Pratidin | real | 300 |
+| Jugantor | real | 300 |
+| Ittefaq | real | 300 |
+| Amar Desh | real | 300 |
+| Shomoyeralo | real | 300 |
+| Daily Inqilab | real | 300 |
+| Bonik Barta | real | 300 |
+| Earki Humor | **fake** | 300 |
+| Earki Satire | **fake** | 300 |
+| Earki News | **fake** | 300 |
+| Earki Interview | **fake** | 300 |
+| **TOTAL** | | **~4,200** |
+
+> Each source stops at its own cap — no single source can dominate the dataset.
+
+---
+
+## 🚀 SETUP — Do This Once
+
+### Step 1 — Install Python
 1. Go to → **https://www.python.org/downloads/**
 2. Click the big yellow **"Download Python 3.x.x"** button
-3. Run the downloaded installer
-4. ⚠️ **VERY IMPORTANT:** Before clicking Install, check the box that says:
-   > ✅ **"Add Python to PATH"**
-   
-   If you miss this, Python won't work in the terminal!
-5. Click **Install Now** and wait
+3. Run the installer
+4. ⚠️ **IMPORTANT:** Check the box **"Add Python to PATH"** before clicking Install!
 
-**How to check if Python is installed correctly:**
-- Press `Windows Key + R` → type `cmd` → press Enter
-- Type this and press Enter:
-  ```
-  python --version
-  ```
-- You should see something like: `Python 3.12.0`
-- If you see an error, Python wasn't installed correctly — try again
-
----
-
-## 🖥️ STEP 2 — Open the Terminal IN the Project Folder
-
-You need to open the terminal (command prompt / PowerShell) **inside** your project folder.
-
-**Easy way:**
-1. Open your `Web_Scraping` folder in File Explorer
-2. Click on the address bar at the top (where it shows the folder path)
-3. Type `powershell` and press **Enter**
-4. A blue PowerShell window will open already in the right folder ✅
-
----
-
-## 📦 STEP 3 — Install Required Packages (Do This Once)
-
-In the PowerShell window you just opened, type this exactly and press Enter:
-
+**Verify it worked:**
 ```
+python --version
+```
+Should show: `Python 3.x.x`
+
+---
+
+### Step 2 — Open Terminal in Project Folder
+
+1. Open your `Web_Scraping` folder in File Explorer
+2. Click the address bar at the top
+3. Type `powershell` → press Enter
+4. A blue PowerShell window opens ✅
+
+---
+
+### Step 3 — Install Required Packages
+
+```powershell
 pip install -r requirements.txt
 ```
 
-You'll see it downloading and installing packages. Wait until it says done.
+---
 
-If `pip` doesn't work, try:
+### Step 4 — Get a FREE YouTube API Key (for YouTube scraper only)
+
+**Takes about 3 minutes:**
+
+1. Go to → **https://console.cloud.google.com/**
+2. Sign in with your Google/Gmail account
+3. Click the project dropdown at the top → **"NEW PROJECT"** → name it anything → **CREATE**
+4. In the search bar, type: `YouTube Data API v3` → click on it → click **ENABLE**
+5. In the left sidebar click **Credentials** → **+ CREATE CREDENTIALS** → **API key**
+6. Copy the key that appears (looks like: `AIzaSyXXXXXXXXXXX`)
+7. Click **CLOSE**
+
+**Add it to the script:**
+
+Open `youtube_scraper.py`, find line ~33:
+```python
+API_KEY = os.environ.get("YOUTUBE_API_KEY", "YOUR_API_KEY_HERE")
 ```
-python -m pip install -r requirements.txt
+Replace `YOUR_API_KEY_HERE` with your actual key:
+```python
+API_KEY = os.environ.get("YOUTUBE_API_KEY", "AIzaSyXXXXXXXXXXX")
 ```
+> Keep the quote marks `" "` around the key!
 
 ---
 
-## 🔑 STEP 4 — Get Your FREE YouTube API Key
+### Step 5 — Add Your YouTube Channels
 
-> ⚠️ You need this ONLY for `youtube_scraper.py`. Skip this if you're only using `scraper.py`.
+Open `youtube_scraper.py`, find the `CHANNELS = [` section and add your channels:
 
-This takes about **3–5 minutes**. Follow carefully:
-
-### 4A — Go to Google Cloud Console
-1. Open your browser and go to → **https://console.cloud.google.com/**
-2. Sign in with your **Google account** (Gmail works)
-
-### 4B — Create a New Project
-1. At the very top of the page, click on the **project dropdown** (it says "Select a project" or shows a project name)
-2. Click **"NEW PROJECT"** in the top right of the popup
-3. Give it any name, like: `fake-news-scraper`
-4. Click **"CREATE"** and wait a few seconds
-5. Make sure your new project is selected (shown at the top)
-
-### 4C — Enable YouTube API
-1. In the search bar at the top, type: `YouTube Data API v3`
-2. Click on **"YouTube Data API v3"** from the results
-3. Click the big blue **"ENABLE"** button
-4. Wait for it to enable (a few seconds)
-
-### 4D — Create Your API Key
-1. On the left sidebar, click **"Credentials"**
-   - If you don't see the sidebar, click the ☰ (hamburger menu) at the top left
-2. Click **"+ CREATE CREDENTIALS"** at the top
-3. Select **"API key"** from the dropdown
-4. A popup will appear showing your API key — it looks like:
-   ```
-   AIzaSyD_xxxxxxxxxxxxxxxxxxxxxxxxxxx
-   ```
-5. Click the **copy icon** to copy it
-6. Click **"CLOSE"**
-
-> ✅ That's your YouTube API Key! Keep it safe — don't share it publicly.
-
----
-
-## ✏️ STEP 5 — Add Your API Key to the Script
-
-1. Open `youtube_scraper.py` in any text editor
-   - VS Code (recommended), Notepad, Notepad++ — anything works
-2. Find this line near the top (around line 33):
-   ```python
-   API_KEY = os.environ.get("YOUTUBE_API_KEY", "YOUR_API_KEY_HERE")
-   ```
-3. Replace `YOUR_API_KEY_HERE` with your actual key:
-   ```python
-   API_KEY = os.environ.get("YOUTUBE_API_KEY", "AIzaSyD_xxxxxxxxxxxxxxxxxxxxxxxxxxx")
-   ```
-   > ⚠️ Keep the quotes `" "` around your key!
-
----
-
-## 📺 STEP 6 — Add Your YouTube Channels
-
-1. Open `youtube_scraper.py`
-2. Find the `CHANNELS = [` section (around line 50–80)
-3. Add your channels inside the square brackets `[ ]`
-
-**Format to follow:**
 ```python
 CHANNELS = [
-    {
-        "url":      "https://www.youtube.com/@CHANNEL_HANDLE_HERE",
-        "label":    "fake",
-        "category": "satire",
-    },
-    {
-        "url":      "https://www.youtube.com/@ANOTHER_CHANNEL",
-        "label":    "real",
-        "category": "news",
-    },
-]
-```
-
-**How to find a channel's URL:**
-1. Go to any YouTube channel page
-2. Look at the browser address bar — copy the full URL
-3. It might look like:
-   - `https://www.youtube.com/@SomoyTV`
-   - `https://www.youtube.com/channel/UCxxxxxx`
-   - Both formats work fine!
-
-**Use `"label": "fake"` for fake/satire channels**
-**Use `"label": "real"` for real news channels**
-
-**Example with real verified Bangladeshi news channels:**
-```python
-CHANNELS = [
-    # Add your fake channels here:
     {
         "url":      "https://www.youtube.com/@YourFakeChannel",
         "label":    "fake",
         "category": "satire",
     },
-
-    # Verified real news channels:
     {
         "url":      "https://www.youtube.com/@somoynews360",
         "label":    "real",
         "category": "news",
     },
-    {
-        "url":      "https://www.youtube.com/@RtvNews",
-        "label":    "real",
-        "category": "news",
-    },
-    {
-        "url":      "https://www.youtube.com/@EkattorTelevision",
-        "label":    "real",
-        "category": "news",
-    },
-    {
-        "url":      "https://www.youtube.com/@JamunaTVbd",
-        "label":    "real",
-        "category": "news",
-    },
-    {
-        "url":      "https://www.youtube.com/@channel24digital",
-        "label":    "real",
-        "category": "news",
-    },
+    # Add more channels here...
 ]
 ```
 
+Supports any URL format:
+- `https://www.youtube.com/@Handle`
+- `https://www.youtube.com/channel/UCxxxxxxxx`
+
 ---
 
-## ▶️ STEP 7 — Run the Scripts
+## ▶️ HOW TO RUN
 
-Open PowerShell in the project folder (see Step 2) and run:
-
-### To collect news articles from websites:
-```
+### Collect news articles (no API key needed):
+```powershell
 python scraper.py
 ```
 
-### To collect YouTube video data:
-```
+### Collect YouTube videos (needs API key + channels configured):
+```powershell
 python youtube_scraper.py
 ```
 
-### You can run both — they save to the SAME file!
-Both scripts add rows to `news_dataset.csv` automatically.
+Both scripts write to the **same** `news_dataset.csv` file automatically.
 
 ---
 
-## 📊 What Does the Output Look Like?
+## 🆕 FRESH START — Start Collection From Zero
 
-All collected data goes into `news_dataset.csv`. Each row looks like:
+> ⚠️ Use this if you want to delete ALL existing data and start again from scratch.
 
-| id | title | text | source | publish_date | category | label | url | content_hash |
-|----|-------|------|--------|-------------|----------|-------|-----|--------------|
-| 1 | বাংলাদেশে... | আজ সকালে... | Somoy TV | 2024-03-15 | news | real | https://... | a3f9c1b2 |
-| 2 | ভাইরাল!! চাঞ্চ... | এই ভিডিওতে... | FakeChannel | 2024-02-10 | satire | fake | https://... | b7d2e4f1 |
-
-- **title** = news headline or YouTube video title
-- **text** = article body text or YouTube video description
-- **source** = news website name or YouTube channel name
-- **publish_date** = when it was published
-- **label** = `real` or `fake` ← this is what your AI model will learn from
-- **url** = link to the original article/video
-
----
-
-## 👀 STEP 8 — How to Watch Progress While Running
-
-**Option 1 — Watch the terminal**
-The script prints each article as it's collected:
+### Option 1 — Use the built-in flag:
+```powershell
+python scraper.py --fresh
+python youtube_scraper.py --fresh
 ```
-[1/300] (real) [Somoy TV] বাংলাদেশে বন্যা পরিস্থিতির উন্নতি...
-[2/300] (fake) [EarkiHumor] ঢাকায় বৃষ্টির কারণে সকল মানুষ মাছ হয়ে গেছে...
+This deletes `visited_urls.txt`, `last_run_state.json` (for news scraper) or `youtube_visited.txt` (for YouTube scraper) before starting. **The CSV file is also deleted** so you start with empty data.
+
+### Option 2 — Delete files manually:
+
+Delete these files from the folder (just delete them in File Explorer):
+```
+news_dataset.csv       ← your collected data (WILL BE LOST)
+visited_urls.txt       ← news scraper memory
+youtube_visited.txt    ← youtube scraper memory
+last_run_state.json    ← scraper progress tracker
+scraper.log            ← log file (safe to delete)
+youtube_scraper.log    ← log file (safe to delete)
+```
+Then run the scripts normally.
+
+> ⚠️ **WARNING:** Fresh start means losing ALL previously collected data.
+> Only do this if you are sure you want to start over!
+> If you just want to collect MORE data, run the script normally — it resumes automatically.
+
+---
+
+## ⏸️ Stopping & Resuming (NO data loss)
+
+- Press **Ctrl + C** to stop anytime
+- Run the same command again to **resume from where you stopped**
+- No duplicates will be added — the script remembers everything
+
+---
+
+## 📊 Watching Progress
+
+While the script runs, you'll see output like:
+```
+[1/4200] (real) [Prothom Alo] সংসদে বাজেট অনুমোদন...
+[2/4200] (fake) [Earki Humor] ঢাকায় বৃষ্টির কারণে সকল মানুষ মাছ...
+✋ [Prothom Alo] cap of 300 reached — moving on
+💾 Batch saved | total_new=10
 ```
 
-**Option 2 — Open the CSV while it runs**
-- Open `news_dataset.csv` in Excel or Google Sheets
-- You'll see rows being added in real-time
-
-**Option 3 — Check the log file**
-- Open `scraper.log` or `youtube_scraper.log` in Notepad
-- Shows detailed activity including any errors
+- `✋ cap reached` → that source hit its 300 limit, moving to next source
+- `💾 Batch saved` → data saved to CSV (happens every 10 articles)
 
 ---
 
-## ⏹️ How to Stop and Resume
+## 🔧 Changing the Collection Limit
 
-- Press **Ctrl + C** in the terminal to stop anytime
-- Just run the same command again to **resume from where you stopped**
-- It will NOT collect duplicates — it remembers everything via `visited_urls.txt`
+**Change how many articles each source collects:**
 
----
-
-## ⚙️ Optional Settings You Can Change
-
-### In `scraper.py`:
-Find these lines near the top and change the numbers:
+In `scraper.py`, find any source and change its `"max"` value:
 ```python
-DEFAULT_MAX = 300      # How many articles to collect per run (increase for more)
-MIN_WORD_COUNT = 50    # Skip articles shorter than this many words
+{
+    "name": "Prothom Alo",
+    "max":  500,          # ← change this number
+    ...
+}
 ```
 
-### In `youtube_scraper.py`:
-```python
-DEFAULT_MAX = 5000     # Max videos to collect (set None for unlimited)
+**Or override ALL sources at runtime:**
+```powershell
+python scraper.py --per_source 500
+```
+This sets every source to collect 500 articles this run.
+
+---
+
+## 👥 SHARING WITH A FRIEND
+
+### Upload to GitHub (recommended)
+
+**Install Git:** https://git-scm.com/downloads
+
+```powershell
+git init
+git add scraper.py youtube_scraper.py merge.py requirements.txt .gitignore README.md
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
+git branch -M main
+git push -u origin main
 ```
 
-### Or use command options:
+> The `.gitignore` file automatically prevents CSV data, logs, and API keys from being uploaded.
+
+### Your friend clones it:
+```powershell
+git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
+cd REPO_NAME
+pip install -r requirements.txt
 ```
-python scraper.py --max_articles 1000
-python youtube_scraper.py --max 2000
-python scraper.py --fresh           ← WARNING: deletes old data and starts over!
+
+Then they:
+- Add their own YouTube API key to `youtube_scraper.py`
+- Add YouTube channels to the `CHANNELS` list
+- Run the scripts normally
+
+### Merging both datasets:
+
+1. Share `news_dataset.csv` files (use Google Drive — can be large)
+2. Rename them: `my_data.csv` and `friends_data.csv`
+3. Edit `merge.py` and update the file names at the top
+4. Run:
+```powershell
+python merge.py
 ```
+Output: `merged_final.csv` with all duplicates removed automatically.
 
 ---
 
@@ -300,88 +298,33 @@ python scraper.py --fresh           ← WARNING: deletes old data and starts ove
 
 | Problem | Fix |
 |---------|-----|
-| `python: command not found` | Python not installed correctly — reinstall and check "Add to PATH" |
-| `pip: command not found` | Try `python -m pip install -r requirements.txt` instead |
+| `python: command not found` | Reinstall Python, check "Add to PATH" |
+| `pip: command not found` | Use `python -m pip install -r requirements.txt` |
 | `ModuleNotFoundError` | Run `pip install -r requirements.txt` again |
-| `API key not set` error | You forgot to add your API key in Step 5 |
-| `quotaExceeded` error | YouTube daily limit hit — come back tomorrow (resets at midnight) |
-| Script is very slow | Normal! It sleeps between requests so websites don't block it |
-| Empty `news_dataset.csv` | Wait a few minutes — some sources take time to start |
-| Script stopped by itself | Just run it again — it resumes where it stopped |
+| `API key not set` error | Add your API key to `youtube_scraper.py` Step 4 |
+| `quotaExceeded` YouTube error | Daily limit hit — come back tomorrow |
+| Script is very slow | Normal! It sleeps between requests to avoid being blocked |
+| `news_dataset.csv` is empty | Wait a few minutes — some sites take time |
 
 ---
 
-## 👥 Sharing With a Friend
+## 📞 Quick Command Reference
 
-**The simple way (no Git):**
-1. Zip ONLY these 4 files:
-   - `scraper.py`
-   - `youtube_scraper.py`
-   - `requirements.txt`
-   - `README.md`
-2. Send the zip via WhatsApp / Email / Google Drive
-3. Your friend does Steps 1–7 on their computer
-4. They also need their own YouTube API key (Step 4)
-
-**Merging your datasets:**
-When both of you have collected data, share your `news_dataset.csv` files.
-The `content_hash` column prevents duplicates when merging.
-
-To merge, run this in Python:
-```python
-import csv
-
-files  = ["my_data.csv", "friends_data.csv"]
-output = "merged_final.csv"
-fields = ["id","title","text","source","publish_date","category","label","url","content_hash"]
-
-seen, rows = set(), []
-for fname in files:
-    with open(fname, encoding="utf-8-sig") as f:
-        for row in csv.DictReader(f):
-            h = row.get("content_hash","")
-            if h and h not in seen:
-                seen.add(h)
-                rows.append(row)
-
-for i, row in enumerate(rows, 1):
-    row["id"] = i
-
-with open(output, "w", encoding="utf-8-sig", newline="") as f:
-    w = csv.DictWriter(f, fieldnames=fields)
-    w.writeheader()
-    w.writerows(rows)
-
-print(f"Done! {len(rows)} unique rows saved to {output}")
-```
-Save this as `merge.py` and run: `python merge.py`
-
----
-
-## 🎯 How Much Data Do You Need?
-
-For a good Deep Learning model:
-
-| Label | Minimum | Good | Excellent |
-|-------|---------|------|-----------|
-| `real` | 500 | 2,000 | 5,000+ |
-| `fake` | 500 | 2,000 | 5,000+ |
-
-**Plan:** Run both scripts every day for a few days. Each run collects 200–500 new items.
-
----
-
-## 📞 Quick Summary — The 3 Commands You'll Use Most
-
-```bash
-# 1. Collect news articles (no API key needed)
+```powershell
+# Collect news articles (300 per source, balanced)
 python scraper.py
 
-# 2. Collect YouTube videos (needs API key + channels configured)
+# Collect YouTube videos
 python youtube_scraper.py
 
-# 3. Merge two CSV files from you and your friend
+# Fresh start — delete all old data
+python scraper.py --fresh
+python youtube_scraper.py --fresh
+
+# Custom limits
+python scraper.py --per_source 500
+python youtube_scraper.py --max 1000
+
+# Merge your data + friend's data
 python merge.py
 ```
-
-That's it! 🎉
