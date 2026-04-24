@@ -35,7 +35,7 @@ import requests
 # ─────────────────────────────────────────────────────────────────────────────
 #  ★  SET YOUR API KEY HERE  (or use env var YOUTUBE_API_KEY)
 # ─────────────────────────────────────────────────────────────────────────────
-API_KEY = os.environ.get("YOUTUBE_API_KEY", "YOUR_API_KEY_HERE")
+API_KEY = os.environ.get("YOUTUBE_API_KEY", "AIzaSyAxJ144u8JNMdGY3IoZm4boTJNnRsNJqp8")
 # ─────────────────────────────────────────────────────────────────────────────
 
 # =============================================================================
@@ -50,21 +50,35 @@ API_KEY = os.environ.get("YOUTUBE_API_KEY", "YOUR_API_KEY_HERE")
 #  "category" → whatever makes sense for your dataset
 # =============================================================================
 
-DEFAULT_CHANNEL_MAX = 50   # videos per channel unless overridden below
+DEFAULT_CHANNEL_MAX = 50  # videos per channel unless overridden below
 
 CHANNELS = [
     # ── Fake / Satire channels ────────────────────────────────────────────────
     # Add your fake news channels here, example:
+     {
+        "url": "https://www.youtube.com/@KESTV",
+        "label": "fake",
+        "category": "politics",
+        "max_videos": 170,  # collect up to 100 from this channel
+    },
+    {
+        "url": "https://www.youtube.com/@%E0%A6%A6%E0%A7%87%E0%A6%B6%E0%A7%87%E0%A6%B0%E0%A6%B0%E0%A6%BE%E0%A6%9C%E0%A6%A8%E0%A7%80%E0%A6%A4%E0%A6%BF%E0%A6%B0",
+        "label": "fake",
+        "category": "politics",
+        "max_videos": 80,  # collect up to 100 from this channel
+    },
     {
         "url": "https://www.youtube.com/@takepartinsolaimananalysis7024",
         "label": "fake",
         "category": "news",
+        "max_videos": 20,
         # no max_videos → uses DEFAULT_CHANNEL_MAX (50)
     },
     {
         "url": "https://www.youtube.com/@solaimananalysis7238",
         "label": "fake",
         "category": "satire",
+        "max_videos": 30,
     },
     {
         "url": "https://www.youtube.com/@NotunShomoy",
@@ -77,6 +91,11 @@ CHANNELS = [
         "category": "news",
     },
     {
+        "url": "https://www.youtube.com/@aalorsondhane",
+        "label": "fake",
+        "category": "politics",
+    },
+    {
         "url": "https://www.youtube.com/@PadatikOfficial",
         "label": "fake",
         "category": "news",
@@ -86,20 +105,15 @@ CHANNELS = [
         "label": "fake",
         "category": "news",
     },
+        {
+        "url": "https://www.youtube.com/@PoliticalTolkshowBD",
+        "label": "fake",
+        "category": "politics",
+    },
     {
         "url": "https://www.youtube.com/@hamidurnews",
         "label": "fake",
         "category": "news",
-    },
-    {
-        "url": "https://www.youtube.com/@aalorsondhane",
-        "label": "fake",
-        "category": "politics",
-    },
-    {
-        "url": "https://www.youtube.com/@PoliticalTolkshowBD",
-        "label": "fake",
-        "category": "politics",
     },
     {
         "url": "https://www.youtube.com/@ZamunaTvAlochona",
@@ -107,17 +121,98 @@ CHANNELS = [
         "category": "politics",
     },
     {
-        "url": "https://www.youtube.com/@KESTV",
+        "url": "https://www.youtube.com/@channel_unique",
         "label": "fake",
-        "category": "politics",
-        "max_videos": 100,   # collect up to 100 from this channel
+        "category": "satire",
+         "max_videos": 70,
     },
     {
-        "url": "https://www.youtube.com/@%E0%A6%A6%E0%A7%87%E0%A6%B6%E0%A7%87%E0%A6%B0%E0%A6%B0%E0%A6%BE%E0%A6%9C%E0%A6%A8%E0%A7%80%E0%A6%A4%E0%A6%BF%E0%A6%B0",
+        "url": "https://www.youtube.com/@worldbanglanewz",
         "label": "fake",
         "category": "politics",
-        "max_videos": 100,   # collect up to 100 from this channel
+         "max_videos": 80,
     },
+    {
+        "url": "https://www.youtube.com/@PodcastNewsBengali",
+        "label": "fake",
+        "category": "national",
+    },
+    {
+        "url": "https://www.youtube.com/@uniquefact7901",
+        "label": "fake",
+        "category": "news",
+        "max_videos": 70,
+    },
+    {
+        "url": "https://www.youtube.com/@jonotarrajnitibd",
+        "label": "fake",
+        "category": "politics",
+    },
+    {
+        "url": "https://www.youtube.com/@banglakathan",
+        "label": "fake",
+        "category": "politics",
+        "max_videos": 20,
+    },
+    {
+        "url": "https://www.youtube.com/@StarExpressbd",
+        "label": "fake",
+        "category": "satire",
+        "max_videos": 20,
+    },
+    {
+        "url": "https://www.youtube.com/@MRBANGLANEWS24",
+        "label": "fake",
+        "category": "satire",
+        "max_videos": 30,
+    },
+    {
+        "url": "https://www.youtube.com/@Changetvpress",
+        "label": "fake",
+        "category": "news",
+        "max_videos": 20,
+    },
+    {
+        "url": "https://www.youtube.com/@filmynews-sk4bb",
+        "label": "fake",
+        "category": "satire",
+        "max_videos": 120,
+    },
+    {
+        "url": "https://www.youtube.com/@NewsTVBangla-24",
+        "label": "fake",
+        "category": "political",
+    },
+    {
+        "url": "https://www.youtube.com/@TRENDS_NEWS_69",
+        "label": "fake",
+        "category": "news",
+        "max_videos": 100,
+    },
+    {
+        "url": "https://www.youtube.com/@NewsTrendsBangla",
+        "label": "fake",
+        "category": "news",
+        "max_videos": 100,
+    },
+    {
+        "url": "https://www.youtube.com/@FaporbazMe",
+        "label": "fake",
+        "category": "satire",
+    },
+    {
+        "url": "https://www.youtube.com/@trendnews855",
+        "label": "fake",
+        "category": "satire",
+        "max_videos": 20,
+    },
+    {
+        "url": "https://www.youtube.com/@ChannelSOnline",
+        "label": "fake",
+        "category": "satire",
+        "max_videos": 30,
+    },
+   
     # ── Real news channels ────────────────────────────────────────────────────
     # {
     #     "url":      "https://www.youtube.com/@SomoyTV",
@@ -358,8 +453,11 @@ def get_playlist_video_ids(
 
 
 def scrape_channel(
-    ch_info: dict, visited: set, id_counter: list, global_max: int | None,
-    global_collected: list
+    ch_info: dict,
+    visited: set,
+    id_counter: list,
+    global_max: int | None,
+    global_collected: list,
 ) -> list[dict]:
     """
     Scrape videos from one channel, respecting both:
@@ -381,8 +479,7 @@ def scrape_channel(
         return []
 
     log.info(
-        f"  ✅ Channel: '{ch_title}'  ID: {ch_id}  "
-        f"label={label}  max={ch_max}"
+        f"  ✅ Channel: '{ch_title}'  ID: {ch_id}  " f"label={label}  max={ch_max}"
     )
 
     playlist_id = get_uploads_playlist_id(ch_id)
@@ -495,10 +592,12 @@ def run(max_videos: int | None = None, fresh: bool = False):
     total_new = 0
     buffer = []
 
-    all_collected: list[dict] = []   # track total across channels for global cap
+    all_collected: list[dict] = []  # track total across channels for global cap
 
     for ch_info in CHANNELS:
-        records = scrape_channel(ch_info, visited, id_counter, max_videos, all_collected)
+        records = scrape_channel(
+            ch_info, visited, id_counter, max_videos, all_collected
+        )
         all_collected.extend(records)
 
         for rec in records:
