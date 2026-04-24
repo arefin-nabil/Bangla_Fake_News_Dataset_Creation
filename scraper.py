@@ -156,124 +156,153 @@ SOURCES = [
             "https://dailyinqilab.com/economy",
         ],
     },
-    {
-        "name":         "Bonik Barta",
+        {
+        "name":         "Desh Rupantor",
         "label":        "real",
         "parser":       "generic_news",
-        "category":     "business",
+        "category":     "national",
         "sitemap_base": None,
         "max":          350,
         "urls": [
-            "https://bonikbarta.com/economy",
-            "https://bonikbarta.com/stock",
-            "https://bonikbarta.com/industry",
+            "https://deshrupantor.com/politics",
+            "https://deshrupantor.com/international",
+            "https://deshrupantor.com/business",
+            "https://deshrupantor.com/national",  
         ],
     },
+        {
+        "name":         "Daily Ittefaq",
+        "label":        "real",
+        "parser":       "generic_news",
+        "category":     "national",
+        "sitemap_base": None,
+        "max":          350,
+        "urls": [
+            "https://ittefaq.com.bd/politics",
+            "https://ittefaq.com.bd/world-news",
+            "https://ittefaq.com.bd/business",
+        ],
+    },
+        {
+        "name":         "Bhorer Kagoj",
+        "label":        "real",
+        "parser":       "generic_news",
+        "category":     "national",
+        "sitemap_base": None,
+        "max":          350,
+        "urls": [
+            "https://bhorerkagoj.com/politics",
+            "https://dailyinqilab.com/economics",
+            "https://dailyinqilab.com/national",
+            "https://dailyinqilab.com/country",
+        ],
+    },
+
 
     # ── FAKE NEWS SOURCE: earki.co (Bangla satire / parody / humor site) ─────
     # All content here is intentionally fictional / satirical — label = fake
     # Each section has its own max — 4 × 300 = 1,200 total from earki
-    {
-        "name":         "Earki Humor",
-        "label":        "fake",
-        "parser":       "earki",
-        "category":     "humor",
-        "sitemap_base": None,
-        "max":          300,
-        "urls": [
-            "https://www.earki.co/humor",
-        ],
-    },
-    {
-        "name":         "Earki Satire",
-        "label":        "fake",
-        "parser":       "earki",
-        "category":     "satire",
-        "sitemap_base": None,
-        "max":          300,
-        "urls": [
-            "https://www.earki.co/satire",
-        ],
-    },
-    {
-        "name":         "Earki News",
-        "label":        "fake",
-        "parser":       "earki",
-        "category":     "fake-news",
-        "sitemap_base": None,
-        "max":          300,
-        "urls": [
-            "https://www.earki.co/news",
-        ],
-    },
-    {
-        "name":         "Earki Interview",
-        "label":        "fake",
-        "parser":       "earki",
-        "category":     "fake-interview",
-        "sitemap_base": None,
-        "max":          300,
-        "urls": [
-            "https://www.earki.co/interview",
-        ],
-    },
+    # {
+    #     "name":         "Earki Humor",
+    #     "label":        "fake",
+    #     "parser":       "earki",
+    #     "category":     "humor",
+    #     "sitemap_base": None,
+    #     "max":          300,
+    #     "urls": [
+    #         "https://www.earki.co/humor",
+    #     ],
+    # },
+    # {
+    #     "name":         "Earki Satire",
+    #     "label":        "fake",
+    #     "parser":       "earki",
+    #     "category":     "satire",
+    #     "sitemap_base": None,
+    #     "max":          300,
+    #     "urls": [
+    #         "https://www.earki.co/satire",
+    #     ],
+    # },
+    # {
+    #     "name":         "Earki News",
+    #     "label":        "fake",
+    #     "parser":       "earki",
+    #     "category":     "fake-news",
+    #     "sitemap_base": None,
+    #     "max":          300,
+    #     "urls": [
+    #         "https://www.earki.co/news",
+    #     ],
+    # },
+    # {
+    #     "name":         "Earki Interview",
+    #     "label":        "fake",
+    #     "parser":       "earki",
+    #     "category":     "fake-interview",
+    #     "sitemap_base": None,
+    #     "max":          300,
+    #     "urls": [
+    #         "https://www.earki.co/interview",
+    #     ],
+    # },
 
     # ── FACT-CHECK SOURCES  (DISABLED for now — set label="disabled") ─────────
     # Uncomment label line and change to "auto" to re-enable in future.
-    {
-        "name":         "Rumor Scanner",
-        "label":        "disabled",   # change to "auto" to enable
-        "parser":       "rumorscanner",
-        "category":     "fact-check",
-        "sitemap_base": None,
-        "urls": [
-            "https://rumorscanner.com/category/fact-check/national",
-            "https://rumorscanner.com/category/fact-check/international",
-            "https://rumorscanner.com/category/fact-check/politics",
-            "https://rumorscanner.com/category/fact-check/health",
-        ],
-    },
-    {
-        "name":         "Fact Watch",
-        "label":        "disabled",
-        "parser":       "factwatch",
-        "category":     "fact-check",
-        "sitemap_base": None,
-        "urls": [
-            "https://www.fact-watch.org/category/%e0%a6%ab%e0%a7%8d%e0%a6%af%e0%a6%be%e0%a6%95%e0%a7%8d%e0%a6%9f%e0%a6%9a%e0%a7%87%e0%a6%95/",
-        ],
-    },
-    {
-        "name":         "Jachai",
-        "label":        "disabled",
-        "parser":       "jachai",
-        "category":     "fact-check",
-        "sitemap_base": None,
-        "urls": [
-            "https://jachai.org/fact-checks",
-        ],
-    },
-    {
-        "name":         "Rumor Inspector",
-        "label":        "disabled",
-        "parser":       "rumorinspector",
-        "category":     "fact-check",
-        "sitemap_base": None,
-        "urls": [
-            "https://rumorinspector.com/category/fact-check/",
-        ],
-    },
-    {
-        "name":         "Boom BD",
-        "label":        "disabled",
-        "parser":       "boombd",
-        "category":     "fact-check",
-        "sitemap_base": None,
-        "urls": [
-            "https://www.boombd.com/fake-news",
-            "https://www.boombd.com/fact-file",
-        ],
-    },
+    # {
+    #     "name":         "Rumor Scanner",
+    #     "label":        "disabled",   # change to "auto" to enable
+    #     "parser":       "rumorscanner",
+    #     "category":     "fact-check",
+    #     "sitemap_base": None,
+    #     "urls": [
+    #         "https://rumorscanner.com/category/fact-check/national",
+    #         "https://rumorscanner.com/category/fact-check/international",
+    #         "https://rumorscanner.com/category/fact-check/politics",
+    #         "https://rumorscanner.com/category/fact-check/health",
+    #     ],
+    # },
+    # {
+    #     "name":         "Fact Watch",
+    #     "label":        "disabled",
+    #     "parser":       "factwatch",
+    #     "category":     "fact-check",
+    #     "sitemap_base": None,
+    #     "urls": [
+    #         "https://www.fact-watch.org/category/%e0%a6%ab%e0%a7%8d%e0%a6%af%e0%a6%be%e0%a6%95%e0%a7%8d%e0%a6%9f%e0%a6%9a%e0%a7%87%e0%a6%95/",
+    #     ],
+    # },
+    # {
+    #     "name":         "Jachai",
+    #     "label":        "disabled",
+    #     "parser":       "jachai",
+    #     "category":     "fact-check",
+    #     "sitemap_base": None,
+    #     "urls": [
+    #         "https://jachai.org/fact-checks",
+    #     ],
+    # },
+    # {
+    #     "name":         "Rumor Inspector",
+    #     "label":        "disabled",
+    #     "parser":       "rumorinspector",
+    #     "category":     "fact-check",
+    #     "sitemap_base": None,
+    #     "urls": [
+    #         "https://rumorinspector.com/category/fact-check/",
+    #     ],
+    # },
+    # {
+    #     "name":         "Boom BD",
+    #     "label":        "disabled",
+    #     "parser":       "boombd",
+    #     "category":     "fact-check",
+    #     "sitemap_base": None,
+    #     "urls": [
+    #         "https://www.boombd.com/fake-news",
+    #         "https://www.boombd.com/fact-file",
+    #     ],
+    # },
 ]
 
 
