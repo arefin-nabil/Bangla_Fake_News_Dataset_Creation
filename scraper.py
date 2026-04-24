@@ -86,8 +86,9 @@ DELAY_MAX        = 3.5
 SITEMAP_DELAY    = 0.4
 REQUEST_TIMEOUT  = 20
 
-# How many listing pages to paginate for earki
-EARKI_MAX_PAGES  = 80           # ~15 articles/page × 80 = ~1200 per section
+# How many AJAX batches to fetch for earki (15 articles/batch)
+EARKI_MAX_BATCHES = 100          # 15 × 100 = 1500 per section max
+EARKI_BATCH_SIZE  = 15           # items per AJAX call
 
 
 # =============================================================================
@@ -103,7 +104,7 @@ SOURCES = [
         "category":     "national",
         "sitemap_base": "https://www.prothomalo.com/sitemap/sitemap-daily-{date}.xml",
         "urls":         [],
-        "max":          350,    # collect at most 300 from this source
+        "max":          350,    # collect at most 350 from this source
     },
     {
         "name":         "Samakal",
@@ -197,6 +198,20 @@ SOURCES = [
             "https://dailyinqilab.com/country",
         ],
     },
+        {
+        "name":         "Bangladesh Bulletin",
+        "label":        "real",
+        "parser":       "generic_news",
+        "category":     "national",
+        "sitemap_base": None,
+        "max":          350,
+        "urls": [
+            "https://bd-bulletin.com/national/102",
+            "https://bd-bulletin.com/politics/115",
+            "https://bd-bulletin.com/economic-business/130",
+            "https://bd-bulletin.com/international/116",
+        ],
+    },
 
 
     # ── FAKE NEWS SOURCE: earki.co (Bangla satire / parody / humor site) ─────
@@ -209,9 +224,8 @@ SOURCES = [
     #     "category":     "humor",
     #     "sitemap_base": None,
     #     "max":          300,
-    #     "urls": [
-    #         "https://www.earki.co/humor",
-    #     ],
+    #     "earki_page_id": 723,           # /humor
+    #     "urls": ["https://www.earki.co/humor"],
     # },
     # {
     #     "name":         "Earki Satire",
@@ -220,9 +234,8 @@ SOURCES = [
     #     "category":     "satire",
     #     "sitemap_base": None,
     #     "max":          300,
-    #     "urls": [
-    #         "https://www.earki.co/satire",
-    #     ],
+    #     "earki_page_id": 735,           # /satire
+    #     "urls": ["https://www.earki.co/satire"],
     # },
     # {
     #     "name":         "Earki News",
@@ -231,9 +244,8 @@ SOURCES = [
     #     "category":     "fake-news",
     #     "sitemap_base": None,
     #     "max":          300,
-    #     "urls": [
-    #         "https://www.earki.co/news",
-    #     ],
+    #     "earki_page_id": 742,           # /news
+    #     "urls": ["https://www.earki.co/news"],
     # },
     # {
     #     "name":         "Earki Interview",
@@ -242,9 +254,18 @@ SOURCES = [
     #     "category":     "fake-interview",
     #     "sitemap_base": None,
     #     "max":          300,
-    #     "urls": [
-    #         "https://www.earki.co/interview",
-    #     ],
+    #     "earki_page_id": 725,           # /interview
+    #     "urls": ["https://www.earki.co/interview"],
+    # },
+    # {
+    #     "name":         "Earki Idea",
+    #     "label":        "fake",
+    #     "parser":       "earki",
+    #     "category":     "fake-idea",
+    #     "sitemap_base": None,
+    #     "max":          300,
+    #     "earki_page_id": 722,           # /idea
+    #     "urls": ["https://www.earki.co/idea"],
     # },
 
     # ── FACT-CHECK SOURCES  (DISABLED for now — set label="disabled") ─────────
@@ -552,61 +573,111 @@ def crawl_listing(base_url: str, max_pages: int = 12):
 
 
 # =============================================================================
-#  EARKI.CO LISTING CRAWLER
-#  URL pattern for listing pages: https://www.earki.co/humor?page=2
-#  URL pattern for articles:      https://www.earki.co/humor/article/11798/slug
+#  EARKI.CO AJAX CRAWLER
+#  earki.co uses a "Load More" button backed by a POST AJAX endpoint:
+#    POST https://www.earki.co/api/theme_engine/get_ajax_contents
+#    Body: start=<offset>&count=15&fk_page_id=<id>&content_types=article
+#  The response is raw HTML snippets with article links.
+#  Article URL pattern: https://www.earki.co/<section>/article/<id>/<slug>
 # =============================================================================
 
-def crawl_earki_listing(base_url: str, max_pages: int = EARKI_MAX_PAGES):
+EARKI_AJAX_URL = "https://www.earki.co/api/theme_engine/get_ajax_contents"
+EARKI_DOMAIN   = "https://www.earki.co"
+_EARKI_ART_RE  = re.compile(r"^/[a-z-]+/article/\d+/", re.I)
+
+
+def crawl_earki_ajax(base_url: str, fk_page_id: int,
+                     max_batches: int = EARKI_MAX_BATCHES,
+                     batch_size: int  = EARKI_BATCH_SIZE):
     """
-    Yield earki.co article URLs from a section listing page.
-    Pagination uses ?page=N (not /page/N/).
-    Stops early if a page returns the same articles as page 1 (loop guard).
+    Yield earki.co article URLs by calling the AJAX Load-More API.
+
+    1. Fetch the landing page first to collect articles already rendered
+       in the initial HTML (offset 1..batch_size are pre-rendered).
+    2. Then POST to the AJAX endpoint with start=batch_size+1, batch_size+1+n, …
+       until the response is empty or we hit max_batches.
     """
-    seen      = set()
-    first_set = None          # articles found on page 1 (loop-detection)
-    domain    = "https://www.earki.co"
+    seen = set()
 
-    # Pattern that matches earki article links, e.g. /humor/article/11798/...
-    article_re = re.compile(r"^/[a-z]+/article/\d+/", re.I)
-
-    for page_num in range(1, max_pages + 1):
-        if page_num == 1:
-            page_url = base_url
-        else:
-            page_url = f"{base_url}?page={page_num}"
-
-        soup = fetch(page_url)
-        if not soup:
-            log.info(f"    [earki] page {page_num} fetch failed — stopping")
-            break
-
-        page_articles = []
+    # ── Step 1: scrape the initial page HTML ──────────────────────────────
+    log.info(f"    [earki] fetching initial page: {base_url}")
+    soup = fetch(base_url)
+    if soup:
         for a in soup.find_all("a", href=True):
             href = a["href"].strip()
-            # Normalise relative paths
             if href.startswith("/"):
-                href = domain + href
-            if not href.startswith(domain):
+                href = EARKI_DOMAIN + href
+            if not href.startswith(EARKI_DOMAIN):
                 continue
             path = urlparse(href).path
-            if article_re.match(path) and href not in seen:
+            if _EARKI_ART_RE.match(path) and href not in seen:
                 seen.add(href)
-                page_articles.append(href)
+                yield href
+        log.info(f"    [earki] initial page: {len(seen)} article links")
+    else:
+        log.warning(f"    [earki] could not fetch initial page {base_url}")
 
-        if not page_articles:
-            log.info(f"    [earki] no articles on page {page_num} — done")
+    polite_sleep()
+
+    # ── Step 2: paginate via AJAX POST ────────────────────────────────────
+    start_offset = batch_size + 1      # first AJAX call starts after initial batch
+    empty_streak = 0
+
+    for batch_num in range(1, max_batches + 1):
+        payload = {
+            "start":         start_offset,
+            "count":         batch_size,
+            "fk_page_id":    fk_page_id,
+            "content_types": "article",
+        }
+        try:
+            resp = SESSION.post(
+                EARKI_AJAX_URL,
+                data=payload,
+                timeout=REQUEST_TIMEOUT,
+                headers={"X-Requested-With": "XMLHttpRequest",
+                         "Referer": base_url},
+            )
+            resp.raise_for_status()
+            html = resp.text.strip()
+        except requests.RequestException as exc:
+            log.warning(f"    [earki] AJAX batch {batch_num} failed: {exc}")
+            empty_streak += 1
+            if empty_streak >= 3:
+                break
+            time.sleep(5)
+            continue
+
+        if not html or html in ("false", "null", "0", ""):
+            log.info(f"    [earki] AJAX batch {batch_num} empty — no more content")
             break
 
-        # Loop detection: if page 2+ returns the exact same set as page 1
-        if first_set is None:
-            first_set = set(page_articles)
-        elif page_num > 1 and set(page_articles) == first_set:
-            log.info(f"    [earki] page {page_num} same as page 1 — pagination ended")
-            break
+        frag = BeautifulSoup(html, "html.parser")
+        batch_links = []
+        for a in frag.find_all("a", href=True):
+            href = a["href"].strip()
+            if href.startswith("/"):
+                href = EARKI_DOMAIN + href
+            if not href.startswith(EARKI_DOMAIN):
+                continue
+            path = urlparse(href).path
+            if _EARKI_ART_RE.match(path) and href not in seen:
+                seen.add(href)
+                batch_links.append(href)
 
-        log.info(f"    [earki] page {page_num}: {len(page_articles)} new article links")
-        yield from page_articles
+        if not batch_links:
+            empty_streak += 1
+            log.info(f"    [earki] AJAX batch {batch_num} (start={start_offset}): 0 new links")
+            if empty_streak >= 3:
+                log.info(f"    [earki] 3 empty batches in a row — stopping")
+                break
+        else:
+            empty_streak = 0
+            log.info(f"    [earki] AJAX batch {batch_num} (start={start_offset}): "
+                     f"{len(batch_links)} new links | total={len(seen)}")
+            yield from batch_links
+
+        start_offset += batch_size
         polite_sleep()
 
 
@@ -620,9 +691,12 @@ def get_urls_for_source(source: dict, start: date, end: date):
         yield from build_sitemap_urls(source, start, end)
     elif source["parser"] == "earki":
         for seed in source["urls"]:
-            log.info(f"  Crawling earki listing: {seed}")
-            yield from crawl_earki_listing(seed)
-            polite_sleep()
+            page_id = source.get("earki_page_id")
+            if not page_id:
+                log.error(f"  [earki] No earki_page_id set for {source['name']} — skipping")
+                continue
+            log.info(f"  Crawling earki AJAX: {seed}  (fk_page_id={page_id})")
+            yield from crawl_earki_ajax(seed, fk_page_id=page_id)
     else:
         for seed in source["urls"]:
             log.info(f"  Crawling listing: {seed}")
@@ -940,8 +1014,8 @@ def scrape(max_articles: int, start: date, end: date):
             log.info("All sources exhausted.")
             break
 
-        # Pick a random active source
-        g = random.choice(active)
+        # Process sources sequentially (first active source each time)
+        g = active[0]
         src = g["source"]
 
         try:
