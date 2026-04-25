@@ -97,121 +97,121 @@ EARKI_BATCH_SIZE  = 15           # items per AJAX call
 
 SOURCES = [
     # ── REAL NEWS (sitemap-based) ─────────────────────────────────────────────
-    {
-        "name":         "Prothom Alo",
-        "label":        "real",
-        "parser":       "prothomalo",
-        "category":     "national",
-        "sitemap_base": "https://www.prothomalo.com/sitemap/sitemap-daily-{date}.xml",
-        "urls":         [],
-        "max":          350,    # collect at most 350 from this source
-    },
-    {
-        "name":         "Samakal",
-        "label":        "real",
-        "parser":       "samakal",
-        "category":     "national",
-        "sitemap_base": "https://samakal.com/sitemap/sitemap-daily-{date}.xml",
-        "urls":         [],
-        "max":          350,
-    },
+    # {
+    #     "name":         "Prothom Alo",
+    #     "label":        "real",
+    #     "parser":       "prothomalo",
+    #     "category":     "national",
+    #     "sitemap_base": "https://www.prothomalo.com/sitemap/sitemap-daily-{date}.xml",
+    #     "urls":         [],
+    #     "max":          350,    # collect at most 350 from this source
+    # },
+    # {
+    #     "name":         "Samakal",
+    #     "label":        "real",
+    #     "parser":       "samakal",
+    #     "category":     "national",
+    #     "sitemap_base": "https://samakal.com/sitemap/sitemap-daily-{date}.xml",
+    #     "urls":         [],
+    #     "max":          350,
+    # },
 
-    # ── REAL NEWS (category-page-based) ──────────────────────────────────────
-    {
-        "name":         "Jugantor",
-        "label":        "real",
-        "parser":       "jugantor",
-        "category":     "national",
-        "sitemap_base": None,
-        "max":          350,
-        "urls": [
-            "https://www.jugantor.com/national",
-            "https://www.jugantor.com/politics",
-            "https://www.jugantor.com/economics",
-            "https://www.jugantor.com/international",
-        ],
-    },
-    {
-        "name":         "Amar Desh",
-        "label":        "real",
-        "parser":       "generic_news",
-        "category":     "national",
-        "sitemap_base": None,
-        "max":          350,
-        "urls": [
-            "https://www.dailyamardesh.com/national",
-            "https://www.dailyamardesh.com/politics",
-            "https://www.dailyamardesh.com/business",
-        ],
-    },
-    {
-        "name":         "Daily Inqilab",
-        "label":        "real",
-        "parser":       "generic_news",
-        "category":     "national",
-        "sitemap_base": None,
-        "max":          350,
-        "urls": [
-            "https://dailyinqilab.com/national",
-            "https://dailyinqilab.com/politics",
-            "https://dailyinqilab.com/economy",
-        ],
-    },
-        {
-        "name":         "Desh Rupantor",
-        "label":        "real",
-        "parser":       "generic_news",
-        "category":     "national",
-        "sitemap_base": None,
-        "max":          350,
-        "urls": [
-            "https://deshrupantor.com/politics",
-            "https://deshrupantor.com/international",
-            "https://deshrupantor.com/business",
-            "https://deshrupantor.com/national",  
-        ],
-    },
-        {
-        "name":         "Daily Ittefaq",
-        "label":        "real",
-        "parser":       "generic_news",
-        "category":     "national",
-        "sitemap_base": None,
-        "max":          350,
-        "urls": [
-            "https://ittefaq.com.bd/politics",
-            "https://ittefaq.com.bd/world-news",
-            "https://ittefaq.com.bd/business",
-        ],
-    },
-        {
-        "name":         "Bhorer Kagoj",
-        "label":        "real",
-        "parser":       "generic_news",
-        "category":     "national",
-        "sitemap_base": None,
-        "max":          350,
-        "urls": [
-            "https://bhorerkagoj.com/politics",
-            "https://dailyinqilab.com/economics",
-            "https://dailyinqilab.com/national",
-            "https://dailyinqilab.com/country",
-        ],
-    },
-        {
-        "name":         "Bangladesh Bulletin",
-        "label":        "real",
-        "parser":       "generic_news",
-        "category":     "national",
-        "sitemap_base": None,
-        "max":          350,
-        "urls": [
-            "https://bd-bulletin.com/national/102",
-            "https://bd-bulletin.com/politics/115",
-            "https://bd-bulletin.com/economic-business/130",
-            "https://bd-bulletin.com/international/116",
-        ],
-    },
+    # # ── REAL NEWS (category-page-based) ──────────────────────────────────────
+    # {
+    #     "name":         "Jugantor",
+    #     "label":        "real",
+    #     "parser":       "jugantor",
+    #     "category":     "national",
+    #     "sitemap_base": None,
+    #     "max":          350,
+    #     "urls": [
+    #         "https://www.jugantor.com/national",
+    #         "https://www.jugantor.com/politics",
+    #         "https://www.jugantor.com/economics",
+    #         "https://www.jugantor.com/international",
+    #     ],
+    # },
+    # {
+    #     "name":         "Amar Desh",
+    #     "label":        "real",
+    #     "parser":       "generic_news",
+    #     "category":     "national",
+    #     "sitemap_base": None,
+    #     "max":          350,
+    #     "urls": [
+    #         "https://www.dailyamardesh.com/national",
+    #         "https://www.dailyamardesh.com/politics",
+    #         "https://www.dailyamardesh.com/business",
+    #     ],
+    # },
+    # {
+    #     "name":         "Daily Inqilab",
+    #     "label":        "real",
+    #     "parser":       "generic_news",
+    #     "category":     "national",
+    #     "sitemap_base": None,
+    #     "max":          350,
+    #     "urls": [
+    #         "https://dailyinqilab.com/national",
+    #         "https://dailyinqilab.com/politics",
+    #         "https://dailyinqilab.com/economy",
+    #     ],
+    # },
+    #     {
+    #     "name":         "Desh Rupantor",
+    #     "label":        "real",
+    #     "parser":       "generic_news",
+    #     "category":     "national",
+    #     "sitemap_base": None,
+    #     "max":          350,
+    #     "urls": [
+    #         "https://deshrupantor.com/politics",
+    #         "https://deshrupantor.com/international",
+    #         "https://deshrupantor.com/business",
+    #         "https://deshrupantor.com/national",  
+    #     ],
+    # },
+    #     {
+    #     "name":         "Daily Ittefaq",
+    #     "label":        "real",
+    #     "parser":       "generic_news",
+    #     "category":     "national",
+    #     "sitemap_base": None,
+    #     "max":          350,
+    #     "urls": [
+    #         "https://ittefaq.com.bd/politics",
+    #         "https://ittefaq.com.bd/world-news",
+    #         "https://ittefaq.com.bd/business",
+    #     ],
+    # },
+    #     {
+    #     "name":         "Bhorer Kagoj",
+    #     "label":        "real",
+    #     "parser":       "generic_news",
+    #     "category":     "national",
+    #     "sitemap_base": None,
+    #     "max":          350,
+    #     "urls": [
+    #         "https://bhorerkagoj.com/politics",
+    #         "https://dailyinqilab.com/economics",
+    #         "https://dailyinqilab.com/national",
+    #         "https://dailyinqilab.com/country",
+    #     ],
+    # },
+    #     {
+    #     "name":         "Bangladesh Bulletin",
+    #     "label":        "real",
+    #     "parser":       "generic_news",
+    #     "category":     "national",
+    #     "sitemap_base": None,
+    #     "max":          350,
+    #     "urls": [
+    #         "https://bd-bulletin.com/national/102",
+    #         "https://bd-bulletin.com/politics/115",
+    #         "https://bd-bulletin.com/economic-business/130",
+    #         "https://bd-bulletin.com/international/116",
+    #     ],
+    # },
 
 
     # ── FAKE NEWS SOURCE: earki.co (Bangla satire / parody / humor site) ─────
@@ -237,36 +237,36 @@ SOURCES = [
     #     "earki_page_id": 735,           # /satire
     #     "urls": ["https://www.earki.co/satire"],
     # },
-    # {
-    #     "name":         "Earki News",
-    #     "label":        "fake",
-    #     "parser":       "earki",
-    #     "category":     "fake-news",
-    #     "sitemap_base": None,
-    #     "max":          300,
-    #     "earki_page_id": 742,           # /news
-    #     "urls": ["https://www.earki.co/news"],
-    # },
-    # {
-    #     "name":         "Earki Interview",
-    #     "label":        "fake",
-    #     "parser":       "earki",
-    #     "category":     "fake-interview",
-    #     "sitemap_base": None,
-    #     "max":          300,
-    #     "earki_page_id": 725,           # /interview
-    #     "urls": ["https://www.earki.co/interview"],
-    # },
-    # {
-    #     "name":         "Earki Idea",
-    #     "label":        "fake",
-    #     "parser":       "earki",
-    #     "category":     "fake-idea",
-    #     "sitemap_base": None,
-    #     "max":          300,
-    #     "earki_page_id": 722,           # /idea
-    #     "urls": ["https://www.earki.co/idea"],
-    # },
+    {
+        "name":         "Earki News",
+        "label":        "fake",
+        "parser":       "earki",
+        "category":     "fake-news",
+        "sitemap_base": None,
+        "max":          600,            # target ~600 from /news
+        "earki_page_id": None,          # auto-detected from page HTML
+        "urls": ["https://www.earki.co/news"],
+    },
+    {
+        "name":         "Earki Interview",
+        "label":        "fake",
+        "parser":       "earki",
+        "category":     "fake-interview",
+        "sitemap_base": None,
+        "max":          200,            # target ~150-200 from /interview
+        "earki_page_id": None,          # auto-detected from page HTML
+        "urls": ["https://www.earki.co/interview"],
+    },
+    {
+        "name":         "Earki Idea",
+        "label":        "fake",
+        "parser":       "earki",
+        "category":     "fake-idea",
+        "sitemap_base": None,
+        "max":          200,            # target ~150-200 from /idea
+        "earki_page_id": None,          # auto-detected from page HTML
+        "urls": ["https://www.earki.co/idea"],
+    },
 
     # ── FACT-CHECK SOURCES  (DISABLED for now — set label="disabled") ─────────
     # Uncomment label line and change to "auto" to re-enable in future.
@@ -586,73 +586,121 @@ EARKI_DOMAIN   = "https://www.earki.co"
 _EARKI_ART_RE  = re.compile(r"^/[a-z-]+/article/\d+/", re.I)
 
 
-def crawl_earki_ajax(base_url: str, fk_page_id: int,
+def crawl_earki_ajax(base_url: str, fk_page_id: int | None,
                      max_batches: int = EARKI_MAX_BATCHES,
                      batch_size: int  = EARKI_BATCH_SIZE):
     """
     Yield earki.co article URLs by calling the AJAX Load-More API.
 
-    1. Fetch the landing page first to collect articles already rendered
-       in the initial HTML (offset 1..batch_size are pre-rendered).
-    2. Then POST to the AJAX endpoint with start=batch_size+1, batch_size+1+n, …
-       until the response is empty or we hit max_batches.
+    Pagination model (discovered by inspecting the HTML):
+      - The page renders an element:  <div class="ajax_load_more"
+              data-fkpageid="<ID>" data-startfrom="1" ...>
+      - `start` is a 1-indexed RECORD OFFSET, NOT a page number.
+      - First AJAX call: start=1  (returns the initial ~12-29 articles)
+      - Subsequent calls increment start by batch_size (12 each time).
+      - API response JSON: {"html": "...", "total": N, "finished": bool}
+      - Stop when finished=True or html is empty.
+
+    The fk_page_id is read dynamically from data-fkpageid on the page
+    (hardcoded IDs may drift; live detection is more reliable).
     """
     seen = set()
 
-    # ── Step 1: scrape the initial page HTML ──────────────────────────────
+    # ── Step 1: fetch the landing page, read real fk_page_id + startfrom ──
     log.info(f"    [earki] fetching initial page: {base_url}")
     soup = fetch(base_url)
-    if soup:
-        for a in soup.find_all("a", href=True):
-            href = a["href"].strip()
-            if href.startswith("/"):
-                href = EARKI_DOMAIN + href
-            if not href.startswith(EARKI_DOMAIN):
-                continue
-            path = urlparse(href).path
-            if _EARKI_ART_RE.match(path) and href not in seen:
-                seen.add(href)
-                yield href
-        log.info(f"    [earki] initial page: {len(seen)} article links")
-    else:
+    if not soup:
         log.warning(f"    [earki] could not fetch initial page {base_url}")
+        return
+
+    # Detect the real fk_page_id from the load-more button
+    btn = soup.find(class_="ajax_load_more")
+    if btn:
+        detected_id = btn.get("data-fkpageid")
+        if detected_id:
+            fk_page_id = int(detected_id)
+            log.info(f"    [earki] detected fk_page_id={fk_page_id} from page HTML")
+
+    if not fk_page_id:
+        log.error(f"    [earki] could not determine fk_page_id for {base_url} — skipping")
+        return
+
+    # Collect links from initial rendered HTML
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        if href.startswith("/"):
+            href = EARKI_DOMAIN + href
+        if not href.startswith(EARKI_DOMAIN):
+            continue
+        path = urlparse(href).path
+        if _EARKI_ART_RE.match(path) and href not in seen:
+            seen.add(href)
+            yield href
+    log.info(f"    [earki] initial page: {len(seen)} article links")
 
     polite_sleep()
 
-    # ── Step 2: paginate via AJAX POST ────────────────────────────────────
-    start_offset = batch_size + 1      # first AJAX call starts after initial batch
+    # ── Step 2: paginate via AJAX (start = record offset, 1-indexed) ──────
+    # First AJAX batch starts at offset 1 (the site's JS reads data-startfrom).
+    # Each batch delivers ~12 articles; we increment by batch_size.
     empty_streak = 0
+    next_start   = 1          # offset for first AJAX call
 
     for batch_num in range(1, max_batches + 1):
-        payload = {
-            "start":         start_offset,
+        params = {
+            "start":         next_start,
             "count":         batch_size,
             "fk_page_id":    fk_page_id,
             "content_types": "article",
+            "author":        0,
+            "tags":          "",
         }
         try:
-            resp = SESSION.post(
+            resp = SESSION.get(
                 EARKI_AJAX_URL,
-                data=payload,
+                params=params,
                 timeout=REQUEST_TIMEOUT,
                 headers={"X-Requested-With": "XMLHttpRequest",
                          "Referer": base_url},
             )
             resp.raise_for_status()
-            html = resp.text.strip()
+            raw = resp.text.strip()
         except requests.RequestException as exc:
-            log.warning(f"    [earki] AJAX batch {batch_num} failed: {exc}")
+            log.warning(f"    [earki] AJAX batch {batch_num} (start={next_start}) failed: {exc}")
             empty_streak += 1
             if empty_streak >= 3:
                 break
             time.sleep(5)
             continue
 
-        if not html or html in ("false", "null", "0", ""):
+        if not raw or raw in ("false", "null", "0", ""):
             log.info(f"    [earki] AJAX batch {batch_num} empty — no more content")
             break
 
-        frag = BeautifulSoup(html, "html.parser")
+        html_content = ""
+        finished     = False
+        total        = None
+        try:
+            data         = json.loads(raw)
+            html_content = data.get("html", "") or ""
+            finished     = bool(data.get("finished", False))
+            total        = data.get("total")
+        except (json.JSONDecodeError, AttributeError):
+            html_content = raw
+
+        if not html_content.strip():
+            empty_streak += 1
+            log.info(f"    [earki] AJAX batch {batch_num} start={next_start}: empty html")
+            if empty_streak >= 3:
+                log.info(f"    [earki] 3 empty batches — stopping")
+                break
+            if finished:
+                log.info(f"    [earki] finished=true — stopping")
+                break
+            next_start += batch_size
+            continue
+
+        frag = BeautifulSoup(html_content, "html.parser")
         batch_links = []
         for a in frag.find_all("a", href=True):
             href = a["href"].strip()
@@ -667,17 +715,23 @@ def crawl_earki_ajax(base_url: str, fk_page_id: int,
 
         if not batch_links:
             empty_streak += 1
-            log.info(f"    [earki] AJAX batch {batch_num} (start={start_offset}): 0 new links")
+            log.info(f"    [earki] batch {batch_num} start={next_start}: 0 new links "
+                     f"(total_seen={len(seen)}, finished={finished})")
             if empty_streak >= 3:
-                log.info(f"    [earki] 3 empty batches in a row — stopping")
+                log.info(f"    [earki] 3 empty batches — stopping")
                 break
         else:
             empty_streak = 0
-            log.info(f"    [earki] AJAX batch {batch_num} (start={start_offset}): "
-                     f"{len(batch_links)} new links | total={len(seen)}")
+            log.info(f"    [earki] batch {batch_num} start={next_start}: "
+                     f"{len(batch_links)} new | total_seen={len(seen)} "
+                     f"| site_total={total} | finished={finished}")
             yield from batch_links
 
-        start_offset += batch_size
+        if finished:
+            log.info(f"    [earki] finished=true — all pages fetched")
+            break
+
+        next_start += batch_size
         polite_sleep()
 
 
@@ -691,11 +745,9 @@ def get_urls_for_source(source: dict, start: date, end: date):
         yield from build_sitemap_urls(source, start, end)
     elif source["parser"] == "earki":
         for seed in source["urls"]:
+            # page_id may be None — crawl_earki_ajax will auto-detect it from the HTML
             page_id = source.get("earki_page_id")
-            if not page_id:
-                log.error(f"  [earki] No earki_page_id set for {source['name']} — skipping")
-                continue
-            log.info(f"  Crawling earki AJAX: {seed}  (fk_page_id={page_id})")
+            log.info(f"  Crawling earki AJAX: {seed}  (fk_page_id={page_id or 'auto-detect'})")
             yield from crawl_earki_ajax(seed, fk_page_id=page_id)
     else:
         for seed in source["urls"]:

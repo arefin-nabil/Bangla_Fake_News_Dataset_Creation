@@ -1,3 +1,4 @@
+# AIzaSyAxJ144u8JNMdGY3IoZm4boTJNnRsNJqp8
 #!/usr/bin/env python3
 # =============================================================================
 #  YouTube Channel Scraper  v2.0
@@ -35,7 +36,7 @@ import requests
 # ─────────────────────────────────────────────────────────────────────────────
 #  ★  SET YOUR API KEY HERE  (or use env var YOUTUBE_API_KEY)
 # ─────────────────────────────────────────────────────────────────────────────
-API_KEY = os.environ.get("YOUTUBE_API_KEY", "AIzaSyAxJ144u8JNMdGY3IoZm4boTJNnRsNJqp8")
+API_KEY = os.environ.get("YOUTUBE_API_KEY", "[ENCRYPTION_KEY]")
 # ─────────────────────────────────────────────────────────────────────────────
 
 # =============================================================================
@@ -55,150 +56,162 @@ DEFAULT_CHANNEL_MAX = 50  # videos per channel unless overridden below
 CHANNELS = [
     # ── Fake / Satire channels ────────────────────────────────────────────────
     # Add your fake news channels here, example:
-     {
+    {
         "url": "https://www.youtube.com/@KESTV",
         "label": "fake",
         "category": "politics",
-        "max_videos": 170,  # collect up to 100 from this channel
+        "max_videos": 40,  # collect up to 100 from this channel
     },
     {
         "url": "https://www.youtube.com/@%E0%A6%A6%E0%A7%87%E0%A6%B6%E0%A7%87%E0%A6%B0%E0%A6%B0%E0%A6%BE%E0%A6%9C%E0%A6%A8%E0%A7%80%E0%A6%A4%E0%A6%BF%E0%A6%B0",
         "label": "fake",
         "category": "politics",
-        "max_videos": 80,  # collect up to 100 from this channel
+        "max_videos": 250,  # collect up to 100 from this channel
     },
     {
         "url": "https://www.youtube.com/@takepartinsolaimananalysis7024",
         "label": "fake",
         "category": "news",
-        "max_videos": 20,
+        "max_videos": 65,
         # no max_videos → uses DEFAULT_CHANNEL_MAX (50)
     },
     {
         "url": "https://www.youtube.com/@solaimananalysis7238",
         "label": "fake",
         "category": "satire",
-        "max_videos": 30,
+        "max_videos": 65,
     },
     {
         "url": "https://www.youtube.com/@NotunShomoy",
         "label": "fake",
         "category": "news",
+        "max_videos": 35,
     },
     {
         "url": "https://www.youtube.com/@BioscopeEntertainment",
         "label": "fake",
         "category": "news",
+        "max_videos": 80,
     },
     {
         "url": "https://www.youtube.com/@aalorsondhane",
         "label": "fake",
         "category": "politics",
+        "max_videos": 35,
     },
     {
         "url": "https://www.youtube.com/@PadatikOfficial",
         "label": "fake",
         "category": "news",
+        "max_videos": 35,
     },
     {
         "url": "https://www.youtube.com/@JNewsTV-r9i",
         "label": "fake",
         "category": "news",
+        "max_videos": 30,
     },
-        {
+    {
         "url": "https://www.youtube.com/@PoliticalTolkshowBD",
         "label": "fake",
         "category": "politics",
+        "max_videos": 30,
     },
     {
         "url": "https://www.youtube.com/@hamidurnews",
         "label": "fake",
         "category": "news",
+        "max_videos": 35,
     },
     {
         "url": "https://www.youtube.com/@ZamunaTvAlochona",
         "label": "fake",
         "category": "politics",
+        "max_videos": 35,
     },
     {
         "url": "https://www.youtube.com/@channel_unique",
         "label": "fake",
         "category": "satire",
-         "max_videos": 70,
+        "max_videos": 50,
     },
     {
         "url": "https://www.youtube.com/@worldbanglanewz",
         "label": "fake",
         "category": "politics",
-         "max_videos": 80,
+        "max_videos": 170,
     },
     {
         "url": "https://www.youtube.com/@PodcastNewsBengali",
         "label": "fake",
         "category": "national",
+        "max_videos": 130,
     },
     {
         "url": "https://www.youtube.com/@uniquefact7901",
         "label": "fake",
         "category": "news",
-        "max_videos": 70,
+        "max_videos": 50,
     },
     {
         "url": "https://www.youtube.com/@jonotarrajnitibd",
         "label": "fake",
         "category": "politics",
+        "max_videos": 20,
     },
     {
         "url": "https://www.youtube.com/@banglakathan",
         "label": "fake",
         "category": "politics",
-        "max_videos": 20,
+        "max_videos": 130,
     },
     {
         "url": "https://www.youtube.com/@StarExpressbd",
         "label": "fake",
         "category": "satire",
-        "max_videos": 20,
+        "max_videos": 10,
     },
     {
         "url": "https://www.youtube.com/@MRBANGLANEWS24",
         "label": "fake",
         "category": "satire",
-        "max_videos": 30,
+        "max_videos": 10,
     },
     {
         "url": "https://www.youtube.com/@Changetvpress",
         "label": "fake",
         "category": "news",
-        "max_videos": 20,
+        "max_videos": 10,
     },
     {
         "url": "https://www.youtube.com/@filmynews-sk4bb",
         "label": "fake",
         "category": "satire",
-        "max_videos": 120,
+        "max_videos": 30,
     },
     {
         "url": "https://www.youtube.com/@NewsTVBangla-24",
         "label": "fake",
         "category": "political",
+        "max_videos": 30,
     },
     {
         "url": "https://www.youtube.com/@TRENDS_NEWS_69",
         "label": "fake",
         "category": "news",
-        "max_videos": 100,
+        "max_videos": 85,
     },
     {
         "url": "https://www.youtube.com/@NewsTrendsBangla",
         "label": "fake",
         "category": "news",
-        "max_videos": 100,
+        "max_videos": 85,
     },
     {
         "url": "https://www.youtube.com/@FaporbazMe",
         "label": "fake",
         "category": "satire",
+        "max_videos": 20,
     },
     {
         "url": "https://www.youtube.com/@trendnews855",
@@ -210,9 +223,8 @@ CHANNELS = [
         "url": "https://www.youtube.com/@ChannelSOnline",
         "label": "fake",
         "category": "satire",
-        "max_videos": 30,
+        "max_videos": 50,
     },
-   
     # ── Real news channels ────────────────────────────────────────────────────
     # {
     #     "url":      "https://www.youtube.com/@SomoyTV",
