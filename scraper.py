@@ -51,6 +51,7 @@ if hasattr(sys.stdout, "reconfigure"):
 import requests
 from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 import warnings
+
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
@@ -58,37 +59,37 @@ warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 #  CONFIGURATION
 # =============================================================================
 
-CSV_FILE         = "news_dataset.csv"
-VISITED_FILE     = "visited_urls.txt"
-STATE_FILE       = "last_run_state.json"
-LOG_FILE         = "scraper.log"
+CSV_FILE = "news_dataset.csv"
+VISITED_FILE = "visited_urls.txt"
+STATE_FILE = "last_run_state.json"
+LOG_FILE = "scraper.log"
 
-DEFAULT_START    = date(2025, 1, 1)
-DEFAULT_END      = date.today()
+DEFAULT_START = date(2025, 1, 1)
+DEFAULT_END = date.today()
 
 # Daily / per-run article limit
-DEFAULT_MAX      = 350
-BATCH_SAVE_EVERY = 10           # flush to CSV every N articles
-MIN_WORD_COUNT   = 50           # earki articles can be shorter (humor/satire)
+DEFAULT_MAX = 350
+BATCH_SAVE_EVERY = 10  # flush to CSV every N articles
+MIN_WORD_COUNT = 50  # earki articles can be shorter (humor/satire)
 
 # ── Per-source cap ────────────────────────────────────────────────────────────
 # Each source collects AT MOST this many articles per run.
 # Override per-source by setting "max" in the SOURCES entry.
 # Set to None to disable (collect as many as available).
-PER_SOURCE_MAX   = 300          # default: 300 per source
+PER_SOURCE_MAX = 300  # default: 300 per source
 
 # Sitemap sampling
-SITEMAP_DAYS_SAMPLE = 45        # how many recent daily sitemaps to walk per source
+SITEMAP_DAYS_SAMPLE = 45  # how many recent daily sitemaps to walk per source
 
 # Crawl delays (seconds)
-DELAY_MIN        = 1.5
-DELAY_MAX        = 3.5
-SITEMAP_DELAY    = 0.4
-REQUEST_TIMEOUT  = 20
+DELAY_MIN = 1.5
+DELAY_MAX = 3.5
+SITEMAP_DELAY = 0.4
+REQUEST_TIMEOUT = 20
 
 # How many AJAX batches to fetch for earki (15 articles/batch)
-EARKI_MAX_BATCHES = 100          # 15 × 100 = 1500 per section max
-EARKI_BATCH_SIZE  = 15           # items per AJAX call
+EARKI_MAX_BATCHES = 100  # 15 × 100 = 1500 per section max
+EARKI_BATCH_SIZE = 15  # items per AJAX call
 
 
 # =============================================================================
@@ -98,176 +99,250 @@ EARKI_BATCH_SIZE  = 15           # items per AJAX call
 SOURCES = [
     # ── REAL NEWS (sitemap-based) ─────────────────────────────────────────────
     # {
-    #     "name":         "Prothom Alo",
-    #     "label":        "real",
-    #     "parser":       "prothomalo",
-    #     "category":     "national",
+    #     "name": "Prothom Alo",
+    #     "label": "real",
+    #     "parser": "prothomalo",
+    #     "category": "national",
     #     "sitemap_base": "https://www.prothomalo.com/sitemap/sitemap-daily-{date}.xml",
-    #     "urls":         [],
-    #     "max":          350,    # collect at most 350 from this source
+    #     "urls": [],
+    #     "max": 350,  # collect at most 350 from this source
     # },
+    # ── REAL NEWS (category-page-based) ──────────────────────────────────────
+    {
+        "name": "Jugantor",
+        "label": "real",
+        "parser": "jugantor",
+        "category": "national",
+        "sitemap_base": None,
+        "max": 350,
+        "urls": [
+            "https://www.jugantor.com/national",
+            "https://www.jugantor.com/politics",
+            "https://www.jugantor.com/economics",
+            "https://www.jugantor.com/international",
+        ],
+    },
     # {
-    #     "name":         "Samakal",
-    #     "label":        "real",
-    #     "parser":       "samakal",
-    #     "category":     "national",
-    #     "sitemap_base": "https://samakal.com/sitemap/sitemap-daily-{date}.xml",
-    #     "urls":         [],
-    #     "max":          350,
-    # },
-
-    # # ── REAL NEWS (category-page-based) ──────────────────────────────────────
-    # {
-    #     "name":         "Jugantor",
-    #     "label":        "real",
-    #     "parser":       "jugantor",
-    #     "category":     "national",
+    #     "name": "Amar Desh",
+    #     "label": "real",
+    #     "parser": "generic_news",
+    #     "category": "national",
     #     "sitemap_base": None,
-    #     "max":          350,
-    #     "urls": [
-    #         "https://www.jugantor.com/national",
-    #         "https://www.jugantor.com/politics",
-    #         "https://www.jugantor.com/economics",
-    #         "https://www.jugantor.com/international",
-    #     ],
-    # },
-    # {
-    #     "name":         "Amar Desh",
-    #     "label":        "real",
-    #     "parser":       "generic_news",
-    #     "category":     "national",
-    #     "sitemap_base": None,
-    #     "max":          350,
+    #     "max": 350,
     #     "urls": [
     #         "https://www.dailyamardesh.com/national",
     #         "https://www.dailyamardesh.com/politics",
     #         "https://www.dailyamardesh.com/business",
+    #         "https://www.dailyamardesh.com/business/bank-financial-institutions",
+    #         "https://www.dailyamardesh.com/business/industry",
+    #         "https://www.dailyamardesh.com/business/import-export",
+    #         "https://www.dailyamardesh.com/business/market-analysis",
+    #         "https://www.dailyamardesh.com/business/economy",
+    #         "https://www.dailyamardesh.com/latest",
+    #         "https://www.dailyamardesh.com/bangladesh",
+    #         "https://www.dailyamardesh.com/bangladesh/dhaka",
+    #         "https://www.dailyamardesh.com/bangladesh/dhaka/gazipur",
+    #         "https://www.dailyamardesh.com/bangladesh/chattogram",
+    #         "https://www.dailyamardesh.com/bangladesh/khulna",
+    #         "https://www.dailyamardesh.com/bangladesh/rajshahi",
+    #         "https://www.dailyamardesh.com/bangladesh/barisal",
+    #         "https://www.dailyamardesh.com/bangladesh/sylhet",
+    #         "https://www.dailyamardesh.com/bangladesh/rangpur",
+    #         "https://www.dailyamardesh.com/bangladesh/mymensingh",
+    #         "https://www.dailyamardesh.com/bangladesh/chattogram/cumilla",
+    #         "https://www.dailyamardesh.com/world",
+    #         "https://www.dailyamardesh.com/world/asia",
+    #         "https://www.dailyamardesh.com/world/china",
+    #         "https://www.dailyamardesh.com/sports",
+    #         "https://www.dailyamardesh.com/religion-islam",
+    #         "https://www.dailyamardesh.com/entertainment",
+    #         "https://www.dailyamardesh.com/feature",
+    #         "https://www.dailyamardesh.com/july-revolution",
+    #         "https://www.dailyamardesh.com/education",
+    #         "https://www.dailyamardesh.com/emigration",
+    #         "https://www.dailyamardesh.com/court-law",
+    #         "https://www.dailyamardesh.com/politics/bnp",
+    #         "https://www.dailyamardesh.com/politics/jamaat",
+    #         "https://www.dailyamardesh.com/politics/ncp",
+    #         "https://www.dailyamardesh.com/capital",
+    #         "https://www.dailyamardesh.com/capital/dhaka-south",
+    #         "https://www.dailyamardesh.com/capital/dhaka-north",
+    #         "https://www.dailyamardesh.com/capital/crime",
     #     ],
     # },
-    # {
-    #     "name":         "Daily Inqilab",
-    #     "label":        "real",
-    #     "parser":       "generic_news",
-    #     "category":     "national",
-    #     "sitemap_base": None,
-    #     "max":          350,
-    #     "urls": [
-    #         "https://dailyinqilab.com/national",
-    #         "https://dailyinqilab.com/politics",
-    #         "https://dailyinqilab.com/economy",
-    #     ],
-    # },
-    #     {
-    #     "name":         "Desh Rupantor",
-    #     "label":        "real",
-    #     "parser":       "generic_news",
-    #     "category":     "national",
-    #     "sitemap_base": None,
-    #     "max":          350,
-    #     "urls": [
-    #         "https://deshrupantor.com/politics",
-    #         "https://deshrupantor.com/international",
-    #         "https://deshrupantor.com/business",
-    #         "https://deshrupantor.com/national",  
-    #     ],
-    # },
-    #     {
-    #     "name":         "Daily Ittefaq",
-    #     "label":        "real",
-    #     "parser":       "generic_news",
-    #     "category":     "national",
-    #     "sitemap_base": None,
-    #     "max":          350,
-    #     "urls": [
-    #         "https://ittefaq.com.bd/politics",
-    #         "https://ittefaq.com.bd/world-news",
-    #         "https://ittefaq.com.bd/business",
-    #     ],
-    # },
-    #     {
-    #     "name":         "Bhorer Kagoj",
-    #     "label":        "real",
-    #     "parser":       "generic_news",
-    #     "category":     "national",
-    #     "sitemap_base": None,
-    #     "max":          350,
-    #     "urls": [
-    #         "https://bhorerkagoj.com/politics",
-    #         "https://dailyinqilab.com/economics",
-    #         "https://dailyinqilab.com/national",
-    #         "https://dailyinqilab.com/country",
-    #     ],
-    # },
-    #     {
-    #     "name":         "Bangladesh Bulletin",
-    #     "label":        "real",
-    #     "parser":       "generic_news",
-    #     "category":     "national",
-    #     "sitemap_base": None,
-    #     "max":          350,
-    #     "urls": [
-    #         "https://bd-bulletin.com/national/102",
-    #         "https://bd-bulletin.com/politics/115",
-    #         "https://bd-bulletin.com/economic-business/130",
-    #         "https://bd-bulletin.com/international/116",
-    #     ],
-    # },
-
-
+    {
+        "name": "Daily Ittefaq",
+        "label": "real",
+        "parser": "generic_news",
+        "category": "national",
+        "sitemap_base": None,
+        "max": 350,
+        "urls": [
+            "https://ittefaq.com.bd/politics",
+            "https://ittefaq.com.bd/latest-news",
+            "https://ittefaq.com.bd/world-news",
+            "https://ittefaq.com.bd/country",
+            "https://ittefaq.com.bd/national",
+            "https://ittefaq.com.bd/entertainment",
+            "https://ittefaq.com.bd/sports",
+            "https://ittefaq.com.bd/lifestyle",
+            "https://ittefaq.com.bd/law-and-court",
+            "https://ittefaq.com.bd/tech",
+            "https://ittefaq.com.bd/capital",
+            "https://ittefaq.com.bd/education",
+        ],
+    },
+    {
+        "name": "Bhorer Kagoj",
+        "label": "real",
+        "parser": "generic_news",
+        "category": "national",
+        "sitemap_base": None,
+        "max": 350,
+        "urls": [
+            "https://bhorerkagoj.com/politics",
+            "https://dailyinqilab.com/economics",
+            "https://dailyinqilab.com/national",
+            "https://dailyinqilab.com/country",
+        ],
+    },
+    {
+        "name": "Bangladesh Bulletin",
+        "label": "real",
+        "parser": "generic_news",
+        "category": "national",
+        "sitemap_base": None,
+        "max": 350,
+        "urls": [
+            "https://bd-bulletin.com/national/102",
+            "https://bd-bulletin.com/politics/115",
+            "https://bd-bulletin.com/economic-business/130",
+            "https://bd-bulletin.com/international/116",
+        ],
+    },
+    {
+        "name": "Samakal",
+        "label": "real",
+        "parser": "samakal",
+        "category": "national",
+        "sitemap_base": "https://samakal.com/sitemap/sitemap-daily-{date}.xml",
+        "urls": [],
+        "max": 350,
+    },
+    {
+        "name": "Daily Inqilab",
+        "label": "real",
+        "parser": "generic_news",
+        "category": "national",
+        "sitemap_base": None,
+        "max": 350,
+        "urls": [
+            "https://dailyinqilab.com/national",
+            "https://dailyinqilab.com/national?page=2",
+            "https://dailyinqilab.com/national?page=3",
+            "https://dailyinqilab.com/national?page=4",
+            "https://dailyinqilab.com/national?page=5",
+            "https://dailyinqilab.com/national?page=6",
+            "https://dailyinqilab.com/national?page=7",
+            "https://dailyinqilab.com/national?page=8",
+            "https://dailyinqilab.com/national?page=9",
+            "https://dailyinqilab.com/politics",
+            "https://dailyinqilab.com/politics?page=2",
+            "https://dailyinqilab.com/politics?page=3",
+            "https://dailyinqilab.com/politics?page=4",
+            "https://dailyinqilab.com/politics?page=5",
+            "https://dailyinqilab.com/politics?page=6",
+            "https://dailyinqilab.com/politics?page=7",
+            "https://dailyinqilab.com/politics?page=8",
+            "https://dailyinqilab.com/politics?page=9",
+            "https://dailyinqilab.com/international",
+            "https://dailyinqilab.com/international?page=2",
+            "https://dailyinqilab.com/international?page=3",
+            "https://dailyinqilab.com/international?page=4",
+            "https://dailyinqilab.com/international?page=5",
+            "https://dailyinqilab.com/bangladesh",
+            "https://dailyinqilab.com/bangladesh?page=2",
+            "https://dailyinqilab.com/bangladesh?page=3",
+            "https://dailyinqilab.com/bangladesh?page=4",
+            "https://dailyinqilab.com/bangladesh?page=5",
+            "https://dailyinqilab.com/economy",
+            "https://dailyinqilab.com/economy?page=2",
+            "https://dailyinqilab.com/economy?page=3",
+            "https://dailyinqilab.com/economy?page=4",
+            "https://dailyinqilab.com/economy?page=5",
+            "https://dailyinqilab.com/economy?page=6",
+            "https://dailyinqilab.com/economy?page=7",
+            "https://dailyinqilab.com/economy?page=8",
+            "https://dailyinqilab.com/economy?page=9",
+        ],
+    },
+    {
+        "name": "Desh Rupantor",
+        "label": "real",
+        "parser": "generic_news",
+        "category": "national",
+        "sitemap_base": None,
+        "max": 350,
+        "urls": [
+            "https://deshrupantor.com/politics",
+            "https://deshrupantor.com/international",
+            "https://deshrupantor.com/business",
+            "https://deshrupantor.com/national",
+        ],
+    },
     # ── FAKE NEWS SOURCE: earki.co (Bangla satire / parody / humor site) ─────
     # All content here is intentionally fictional / satirical — label = fake
     # Each section has its own max — 4 × 300 = 1,200 total from earki
     # {
-    #     "name":         "Earki Humor",
-    #     "label":        "fake",
-    #     "parser":       "earki",
-    #     "category":     "humor",
+    #     "name": "Earki News",
+    #     "label": "fake",
+    #     "parser": "earki",
+    #     "category": "fake-news",
     #     "sitemap_base": None,
-    #     "max":          300,
-    #     "earki_page_id": 723,           # /humor
+    #     "max": 600,  # target ~600 from /news
+    #     "earki_page_id": None,  # auto-detected from page HTML
+    #     "urls": ["https://www.earki.co/news"],
+    # },
+    # {
+    #     "name": "Earki Interview",
+    #     "label": "fake",
+    #     "parser": "earki",
+    #     "category": "fake-interview",
+    #     "sitemap_base": None,
+    #     "max": 200,  # target ~150-200 from /interview
+    #     "earki_page_id": None,  # auto-detected from page HTML
+    #     "urls": ["https://www.earki.co/interview"],
+    # },
+    # {
+    #     "name": "Earki Idea",
+    #     "label": "fake",
+    #     "parser": "earki",
+    #     "category": "fake-idea",
+    #     "sitemap_base": None,
+    #     "max": 200,  # target ~150-200 from /idea
+    #     "earki_page_id": None,  # auto-detected from page HTML
+    #     "urls": ["https://www.earki.co/idea"],
+    # },
+    # {
+    #     "name": "Earki Humor",
+    #     "label": "fake",
+    #     "parser": "earki",
+    #     "category": "humor",
+    #     "sitemap_base": None,
+    #     "max": 300,
+    #     "earki_page_id": 723,  # /humor
     #     "urls": ["https://www.earki.co/humor"],
     # },
     # {
-    #     "name":         "Earki Satire",
-    #     "label":        "fake",
-    #     "parser":       "earki",
-    #     "category":     "satire",
+    #     "name": "Earki Satire",
+    #     "label": "fake",
+    #     "parser": "earki",
+    #     "category": "satire",
     #     "sitemap_base": None,
-    #     "max":          300,
-    #     "earki_page_id": 735,           # /satire
+    #     "max": 300,
+    #     "earki_page_id": 735,  # /satire
     #     "urls": ["https://www.earki.co/satire"],
     # },
-    {
-        "name":         "Earki News",
-        "label":        "fake",
-        "parser":       "earki",
-        "category":     "fake-news",
-        "sitemap_base": None,
-        "max":          600,            # target ~600 from /news
-        "earki_page_id": None,          # auto-detected from page HTML
-        "urls": ["https://www.earki.co/news"],
-    },
-    {
-        "name":         "Earki Interview",
-        "label":        "fake",
-        "parser":       "earki",
-        "category":     "fake-interview",
-        "sitemap_base": None,
-        "max":          200,            # target ~150-200 from /interview
-        "earki_page_id": None,          # auto-detected from page HTML
-        "urls": ["https://www.earki.co/interview"],
-    },
-    {
-        "name":         "Earki Idea",
-        "label":        "fake",
-        "parser":       "earki",
-        "category":     "fake-idea",
-        "sitemap_base": None,
-        "max":          200,            # target ~150-200 from /idea
-        "earki_page_id": None,          # auto-detected from page HTML
-        "urls": ["https://www.earki.co/idea"],
-    },
-
     # ── FACT-CHECK SOURCES  (DISABLED for now — set label="disabled") ─────────
     # Uncomment label line and change to "auto" to re-enable in future.
     # {
@@ -347,15 +422,17 @@ log = logging.getLogger(__name__)
 # =============================================================================
 
 SESSION = requests.Session()
-SESSION.headers.update({
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "bn-BD,bn;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-})
+SESSION.headers.update(
+    {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept-Language": "bn-BD,bn;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    }
+)
 
 
 def fetch(url: str, retries: int = 3) -> BeautifulSoup | None:
@@ -396,8 +473,17 @@ def polite_sleep():
 #  STATE & STORAGE
 # =============================================================================
 
-CSV_FIELDS = ["id", "title", "text", "source", "publish_date",
-              "category", "label", "url", "content_hash"]
+CSV_FIELDS = [
+    "id",
+    "title",
+    "text",
+    "source",
+    "publish_date",
+    "category",
+    "label",
+    "url",
+    "content_hash",
+]
 
 
 def content_hash(title: str, text: str) -> str:
@@ -475,6 +561,7 @@ def append_to_csv(articles: list[dict]):
 #  DATE HELPERS
 # =============================================================================
 
+
 def date_range(start: date, end: date):
     current = end
     while current >= start:
@@ -512,6 +599,7 @@ def in_date_range(d: date | None, start: date, end: date) -> bool:
 #  SITEMAP HELPERS  (generator-based — no upfront bulk loading)
 # =============================================================================
 
+
 def _sitemap_urls(sitemap_url: str) -> list[str]:
     soup = fetch_xml(sitemap_url)
     if not soup:
@@ -523,7 +611,7 @@ def build_sitemap_urls(source: dict, start: date, end: date):
     """Yield article URLs one sitemap-day at a time."""
     template = source["sitemap_base"]
     all_dates = list(date_range(start, end))
-    sampled   = all_dates[:SITEMAP_DAYS_SAMPLE]
+    sampled = all_dates[:SITEMAP_DAYS_SAMPLE]
 
     log.info(f"  [{source['name']}] Walking {len(sampled)} daily sitemaps...")
     for i, d in enumerate(sampled, 1):
@@ -539,13 +627,16 @@ def build_sitemap_urls(source: dict, start: date, end: date):
 #  LISTING-PAGE CRAWLER  (generic — for real-news category pages)
 # =============================================================================
 
+
 def crawl_listing(base_url: str, max_pages: int = 12):
     """Yield article URLs discovered by paginating a category/listing page."""
     domain = f"{urlparse(base_url).scheme}://{urlparse(base_url).netloc}"
-    seen   = set()
+    seen = set()
 
     for page_num in range(1, max_pages + 1):
-        page_url = base_url if page_num == 1 else f"{base_url.rstrip('/')}/page/{page_num}/"
+        page_url = (
+            base_url if page_num == 1 else f"{base_url.rstrip('/')}/page/{page_num}/"
+        )
 
         soup = fetch(page_url)
         if not soup:
@@ -559,7 +650,9 @@ def crawl_listing(base_url: str, max_pages: int = 12):
             if urlparse(href).netloc != urlparse(domain).netloc:
                 continue
             path = urlparse(href).path
-            if re.search(r"/(page|category|tag|search|author|about|contact|archive|menu)", path):
+            if re.search(
+                r"/(page|category|tag|search|author|about|contact|archive|menu)", path
+            ):
                 continue
             if path.count("/") >= 2 and len(path) > 10 and href not in seen:
                 seen.add(href)
@@ -582,13 +675,16 @@ def crawl_listing(base_url: str, max_pages: int = 12):
 # =============================================================================
 
 EARKI_AJAX_URL = "https://www.earki.co/api/theme_engine/get_ajax_contents"
-EARKI_DOMAIN   = "https://www.earki.co"
-_EARKI_ART_RE  = re.compile(r"^/[a-z-]+/article/\d+/", re.I)
+EARKI_DOMAIN = "https://www.earki.co"
+_EARKI_ART_RE = re.compile(r"^/[a-z-]+/article/\d+/", re.I)
 
 
-def crawl_earki_ajax(base_url: str, fk_page_id: int | None,
-                     max_batches: int = EARKI_MAX_BATCHES,
-                     batch_size: int  = EARKI_BATCH_SIZE):
+def crawl_earki_ajax(
+    base_url: str,
+    fk_page_id: int | None,
+    max_batches: int = EARKI_MAX_BATCHES,
+    batch_size: int = EARKI_BATCH_SIZE,
+):
     """
     Yield earki.co article URLs by calling the AJAX Load-More API.
 
@@ -622,7 +718,9 @@ def crawl_earki_ajax(base_url: str, fk_page_id: int | None,
             log.info(f"    [earki] detected fk_page_id={fk_page_id} from page HTML")
 
     if not fk_page_id:
-        log.error(f"    [earki] could not determine fk_page_id for {base_url} — skipping")
+        log.error(
+            f"    [earki] could not determine fk_page_id for {base_url} — skipping"
+        )
         return
 
     # Collect links from initial rendered HTML
@@ -644,29 +742,30 @@ def crawl_earki_ajax(base_url: str, fk_page_id: int | None,
     # First AJAX batch starts at offset 1 (the site's JS reads data-startfrom).
     # Each batch delivers ~12 articles; we increment by batch_size.
     empty_streak = 0
-    next_start   = 1          # offset for first AJAX call
+    next_start = 1  # offset for first AJAX call
 
     for batch_num in range(1, max_batches + 1):
         params = {
-            "start":         next_start,
-            "count":         batch_size,
-            "fk_page_id":    fk_page_id,
+            "start": next_start,
+            "count": batch_size,
+            "fk_page_id": fk_page_id,
             "content_types": "article",
-            "author":        0,
-            "tags":          "",
+            "author": 0,
+            "tags": "",
         }
         try:
             resp = SESSION.get(
                 EARKI_AJAX_URL,
                 params=params,
                 timeout=REQUEST_TIMEOUT,
-                headers={"X-Requested-With": "XMLHttpRequest",
-                         "Referer": base_url},
+                headers={"X-Requested-With": "XMLHttpRequest", "Referer": base_url},
             )
             resp.raise_for_status()
             raw = resp.text.strip()
         except requests.RequestException as exc:
-            log.warning(f"    [earki] AJAX batch {batch_num} (start={next_start}) failed: {exc}")
+            log.warning(
+                f"    [earki] AJAX batch {batch_num} (start={next_start}) failed: {exc}"
+            )
             empty_streak += 1
             if empty_streak >= 3:
                 break
@@ -678,19 +777,21 @@ def crawl_earki_ajax(base_url: str, fk_page_id: int | None,
             break
 
         html_content = ""
-        finished     = False
-        total        = None
+        finished = False
+        total = None
         try:
-            data         = json.loads(raw)
+            data = json.loads(raw)
             html_content = data.get("html", "") or ""
-            finished     = bool(data.get("finished", False))
-            total        = data.get("total")
+            finished = bool(data.get("finished", False))
+            total = data.get("total")
         except (json.JSONDecodeError, AttributeError):
             html_content = raw
 
         if not html_content.strip():
             empty_streak += 1
-            log.info(f"    [earki] AJAX batch {batch_num} start={next_start}: empty html")
+            log.info(
+                f"    [earki] AJAX batch {batch_num} start={next_start}: empty html"
+            )
             if empty_streak >= 3:
                 log.info(f"    [earki] 3 empty batches — stopping")
                 break
@@ -715,16 +816,20 @@ def crawl_earki_ajax(base_url: str, fk_page_id: int | None,
 
         if not batch_links:
             empty_streak += 1
-            log.info(f"    [earki] batch {batch_num} start={next_start}: 0 new links "
-                     f"(total_seen={len(seen)}, finished={finished})")
+            log.info(
+                f"    [earki] batch {batch_num} start={next_start}: 0 new links "
+                f"(total_seen={len(seen)}, finished={finished})"
+            )
             if empty_streak >= 3:
                 log.info(f"    [earki] 3 empty batches — stopping")
                 break
         else:
             empty_streak = 0
-            log.info(f"    [earki] batch {batch_num} start={next_start}: "
-                     f"{len(batch_links)} new | total_seen={len(seen)} "
-                     f"| site_total={total} | finished={finished}")
+            log.info(
+                f"    [earki] batch {batch_num} start={next_start}: "
+                f"{len(batch_links)} new | total_seen={len(seen)} "
+                f"| site_total={total} | finished={finished}"
+            )
             yield from batch_links
 
         if finished:
@@ -739,6 +844,7 @@ def crawl_earki_ajax(base_url: str, fk_page_id: int | None,
 #  URL DISPATCHER
 # =============================================================================
 
+
 def get_urls_for_source(source: dict, start: date, end: date):
     """Generator: yield candidate URLs from this source's sitemap or listing pages."""
     if source.get("sitemap_base"):
@@ -747,7 +853,9 @@ def get_urls_for_source(source: dict, start: date, end: date):
         for seed in source["urls"]:
             # page_id may be None — crawl_earki_ajax will auto-detect it from the HTML
             page_id = source.get("earki_page_id")
-            log.info(f"  Crawling earki AJAX: {seed}  (fk_page_id={page_id or 'auto-detect'})")
+            log.info(
+                f"  Crawling earki AJAX: {seed}  (fk_page_id={page_id or 'auto-detect'})"
+            )
             yield from crawl_earki_ajax(seed, fk_page_id=page_id)
     else:
         for seed in source["urls"]:
@@ -760,12 +868,13 @@ def get_urls_for_source(source: dict, start: date, end: date):
 #  UNIVERSAL PARSE HELPERS
 # =============================================================================
 
+
 def _extract_pub_date(soup: BeautifulSoup) -> date | None:
     # 1) JSON-LD
     for script in soup.find_all("script", type="application/ld+json"):
         try:
             data = json.loads(script.string or "")
-            for item in (data if isinstance(data, list) else [data]):
+            for item in data if isinstance(data, list) else [data]:
                 ds = item.get("datePublished") or item.get("dateModified")
                 if ds:
                     d = parse_date_str(ds)
@@ -774,7 +883,12 @@ def _extract_pub_date(soup: BeautifulSoup) -> date | None:
         except Exception:
             pass
     # 2) OG / article meta
-    for prop in ["article:published_time", "article:modified_time", "og:updated_time", "pubdate"]:
+    for prop in [
+        "article:published_time",
+        "article:modified_time",
+        "og:updated_time",
+        "pubdate",
+    ]:
         m = soup.find("meta", property=prop) or soup.find("meta", attrs={"name": prop})
         if m:
             d = parse_date_str(m.get("content", ""))
@@ -797,8 +911,10 @@ def _extract_pub_date(soup: BeautifulSoup) -> date | None:
 
 def _generic_body(soup: BeautifulSoup) -> str:
     body = None
-    for cls_pat in [r"article.?body|news.?body|post.?body|entry.?content",
-                    r"detail|story|content|article"]:
+    for cls_pat in [
+        r"article.?body|news.?body|post.?body|entry.?content",
+        r"detail|story|content|article",
+    ]:
         body = soup.find("div", class_=re.compile(cls_pat, re.I))
         if body:
             break
@@ -806,111 +922,181 @@ def _generic_body(soup: BeautifulSoup) -> str:
         body = soup.find("div", {"data-story-element": True})
     if not body:
         body = soup.find("article")
-    return " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    return " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
 
 
 # =============================================================================
 #  SITE-SPECIFIC PARSERS
 # =============================================================================
 
+
 def parse_prothomalo(soup: BeautifulSoup, url: str) -> dict | None:
     title_tag = soup.find("h1") or soup.find("meta", property="og:title")
-    title = (title_tag.get("content") if title_tag and title_tag.name == "meta"
-             else title_tag.get_text(strip=True) if title_tag else "")
-    body = soup.find("div", {"data-story-element": True}) or \
-           soup.find("div", class_=re.compile(r"story|article|content", re.I)) or \
-           soup.find("article")
-    text = " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    title = (
+        title_tag.get("content")
+        if title_tag and title_tag.name == "meta"
+        else title_tag.get_text(strip=True) if title_tag else ""
+    )
+    body = (
+        soup.find("div", {"data-story-element": True})
+        or soup.find("div", class_=re.compile(r"story|article|content", re.I))
+        or soup.find("article")
+    )
+    text = " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
     pub_date = _extract_pub_date(soup)
     parts = urlparse(url).path.strip("/").split("/")
     category = parts[0] if parts else "national"
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "", "category": category}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": category,
+    }
 
 
 def parse_samakal(soup: BeautifulSoup, url: str) -> dict | None:
     title_tag = soup.find("h1") or soup.find("meta", property="og:title")
-    title = (title_tag.get("content") if title_tag and title_tag.name == "meta"
-             else title_tag.get_text(strip=True) if title_tag else "")
-    body = soup.find("div", class_=re.compile(r"detail|article|content|story", re.I)) or \
-           soup.find("article")
-    text = " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    title = (
+        title_tag.get("content")
+        if title_tag and title_tag.name == "meta"
+        else title_tag.get_text(strip=True) if title_tag else ""
+    )
+    body = soup.find(
+        "div", class_=re.compile(r"detail|article|content|story", re.I)
+    ) or soup.find("article")
+    text = " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
     pub_date = _extract_pub_date(soup)
     parts = urlparse(url).path.strip("/").split("/")
     category = parts[0] if parts else "national"
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "", "category": category}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": category,
+    }
 
 
 def parse_jugantor(soup: BeautifulSoup, url: str) -> dict | None:
     title_tag = soup.find("h1")
     title = title_tag.get_text(strip=True) if title_tag else ""
-    body = soup.find("div", class_=re.compile(r"news|article|detail|content", re.I)) or \
-           soup.find("div", id=re.compile(r"content|article", re.I))
-    text = " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    body = soup.find(
+        "div", class_=re.compile(r"news|article|detail|content", re.I)
+    ) or soup.find("div", id=re.compile(r"content|article", re.I))
+    text = " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
     pub_date = _extract_pub_date(soup)
     parts = urlparse(url).path.strip("/").split("/")
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "",
-            "category": parts[0] if parts else "national"}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": parts[0] if parts else "national",
+    }
 
 
 def parse_ittefaq(soup: BeautifulSoup, url: str) -> dict | None:
     title_tag = soup.find("h1") or soup.find("meta", property="og:title")
-    title = (title_tag.get("content") if title_tag and title_tag.name == "meta"
-             else title_tag.get_text(strip=True) if title_tag else "")
-    body = soup.find("div", class_="details-body") or \
-           soup.find("div", class_=re.compile(r"detail|news|article|body", re.I))
-    text = " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    title = (
+        title_tag.get("content")
+        if title_tag and title_tag.name == "meta"
+        else title_tag.get_text(strip=True) if title_tag else ""
+    )
+    body = soup.find("div", class_="details-body") or soup.find(
+        "div", class_=re.compile(r"detail|news|article|body", re.I)
+    )
+    text = " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
     pub_date = _extract_pub_date(soup)
     parts = urlparse(url).path.strip("/").split("/")
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "",
-            "category": parts[0] if parts else "national"}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": parts[0] if parts else "national",
+    }
 
 
 def parse_generic_news(soup: BeautifulSoup, url: str) -> dict | None:
     title_tag = soup.find("h1") or soup.find("meta", property="og:title")
-    title = (title_tag.get("content") if title_tag and title_tag.name == "meta"
-             else title_tag.get_text(strip=True) if title_tag else "")
+    title = (
+        title_tag.get("content")
+        if title_tag and title_tag.name == "meta"
+        else title_tag.get_text(strip=True) if title_tag else ""
+    )
     text = _generic_body(soup)
     pub_date = _extract_pub_date(soup)
     parts = urlparse(url).path.strip("/").split("/")
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "",
-            "category": parts[0] if parts else "national"}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": parts[0] if parts else "national",
+    }
 
 
 def parse_shomoyeralo(soup: BeautifulSoup, url: str) -> dict | None:
-    title_tag = (soup.find("h1") or
-                 soup.find("h2", class_=re.compile(r"title|heading", re.I)) or
-                 soup.find("meta", property="og:title"))
-    title = (title_tag.get("content") if title_tag and title_tag.name == "meta"
-             else title_tag.get_text(strip=True) if title_tag else "")
-    body = soup.find("div", class_=re.compile(r"details?|body|content|news", re.I)) or \
-           soup.find("article")
-    text = " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    title_tag = (
+        soup.find("h1")
+        or soup.find("h2", class_=re.compile(r"title|heading", re.I))
+        or soup.find("meta", property="og:title")
+    )
+    title = (
+        title_tag.get("content")
+        if title_tag and title_tag.name == "meta"
+        else title_tag.get_text(strip=True) if title_tag else ""
+    )
+    body = soup.find(
+        "div", class_=re.compile(r"details?|body|content|news", re.I)
+    ) or soup.find("article")
+    text = " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
     pub_date = _extract_pub_date(soup)
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "", "category": "national"}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": "national",
+    }
 
 
 def parse_bd_pratidin(soup: BeautifulSoup, url: str) -> dict | None:
     title_tag = soup.find("h1") or soup.find("meta", property="og:title")
-    title = (title_tag.get("content") if title_tag and title_tag.name == "meta"
-             else title_tag.get_text(strip=True) if title_tag else "")
-    body = (soup.find("div", class_=re.compile(r"details?.body|news.details|article.body", re.I)) or
-            soup.find("div", class_=re.compile(r"detail|content|story", re.I)) or
-            soup.find("article"))
-    text = " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    title = (
+        title_tag.get("content")
+        if title_tag and title_tag.name == "meta"
+        else title_tag.get_text(strip=True) if title_tag else ""
+    )
+    body = (
+        soup.find(
+            "div", class_=re.compile(r"details?.body|news.details|article.body", re.I)
+        )
+        or soup.find("div", class_=re.compile(r"detail|content|story", re.I))
+        or soup.find("article")
+    )
+    text = " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
     pub_date = _extract_pub_date(soup)
     parts = urlparse(url).path.strip("/").split("/")
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "",
-            "category": parts[0] if parts else "national"}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": parts[0] if parts else "national",
+    }
 
 
 # ── Earki.co article parser ───────────────────────────────────────────────────
+
 
 def parse_earki(soup: BeautifulSoup, url: str) -> dict | None:
     """
@@ -946,12 +1132,18 @@ def parse_earki(soup: BeautifulSoup, url: str) -> dict | None:
     body_text = ""
 
     # Try common content wrappers first
-    for cls_pat in [r"article.?content|post.?content|entry.?content",
-                    r"article.?body|story.?body|content",
-                    r"article"]:
+    for cls_pat in [
+        r"article.?content|post.?content|entry.?content",
+        r"article.?body|story.?body|content",
+        r"article",
+    ]:
         div = soup.find("div", class_=re.compile(cls_pat, re.I))
         if div:
-            paras = [p.get_text(" ", strip=True) for p in div.find_all("p") if len(p.get_text(strip=True)) > 20]
+            paras = [
+                p.get_text(" ", strip=True)
+                for p in div.find_all("p")
+                if len(p.get_text(strip=True)) > 20
+            ]
             if paras:
                 body_text = " ".join(paras)
                 break
@@ -971,51 +1163,78 @@ def parse_earki(soup: BeautifulSoup, url: str) -> dict | None:
     category = path_parts[0] if path_parts else "humor"
 
     return {
-        "title":        title,
-        "text":         body_text,
+        "title": title,
+        "text": body_text,
         "publish_date": str(pub_date) if pub_date else "",
-        "category":     category,
+        "category": category,
     }
 
 
 # ── Disabled fact-check parsers (kept for future use) ─────────────────────────
 
+
 def _parse_factcheck_base(soup: BeautifulSoup, url: str) -> dict | None:
     title_tag = soup.find("h1") or soup.find("meta", property="og:title")
-    title = (title_tag.get("content") if title_tag and title_tag.name == "meta"
-             else title_tag.get_text(strip=True) if title_tag else "")
-    body = (soup.find("div", class_=re.compile(r"entry.content|post.content|article.body", re.I)) or
-            soup.find("div", class_=re.compile(r"entry|content|article", re.I)) or
-            soup.find("article"))
-    text = " ".join(p.get_text(" ", strip=True) for p in (body.find_all("p") if body else []))
+    title = (
+        title_tag.get("content")
+        if title_tag and title_tag.name == "meta"
+        else title_tag.get_text(strip=True) if title_tag else ""
+    )
+    body = (
+        soup.find(
+            "div", class_=re.compile(r"entry.content|post.content|article.body", re.I)
+        )
+        or soup.find("div", class_=re.compile(r"entry|content|article", re.I))
+        or soup.find("article")
+    )
+    text = " ".join(
+        p.get_text(" ", strip=True) for p in (body.find_all("p") if body else [])
+    )
     pub_date = _extract_pub_date(soup)
-    return {"title": title, "text": text,
-            "publish_date": str(pub_date) if pub_date else "", "category": "fact-check"}
+    return {
+        "title": title,
+        "text": text,
+        "publish_date": str(pub_date) if pub_date else "",
+        "category": "fact-check",
+    }
 
 
-def parse_rumorscanner(soup, url):  return _parse_factcheck_base(soup, url)
-def parse_factwatch(soup, url):     return _parse_factcheck_base(soup, url)
-def parse_jachai(soup, url):        return _parse_factcheck_base(soup, url)
-def parse_rumorinspector(soup, url): return _parse_factcheck_base(soup, url)
-def parse_boombd(soup, url):        return _parse_factcheck_base(soup, url)
+def parse_rumorscanner(soup, url):
+    return _parse_factcheck_base(soup, url)
+
+
+def parse_factwatch(soup, url):
+    return _parse_factcheck_base(soup, url)
+
+
+def parse_jachai(soup, url):
+    return _parse_factcheck_base(soup, url)
+
+
+def parse_rumorinspector(soup, url):
+    return _parse_factcheck_base(soup, url)
+
+
+def parse_boombd(soup, url):
+    return _parse_factcheck_base(soup, url)
 
 
 # Parser dispatch table
 PARSERS = {
-    "prothomalo":    parse_prothomalo,
-    "samakal":       parse_samakal,
-    "jugantor":      parse_jugantor,
-    "ittefaq":       parse_ittefaq,
-    "generic_news":  parse_generic_news,
-    "shomoyeralo":   parse_shomoyeralo,
-    "bd_pratidin":   parse_bd_pratidin,
-    "earki":         parse_earki,
+    "prothomalo": parse_prothomalo,
+    "samakal": parse_samakal,
+    "jugantor": parse_jugantor,
+    "ittefaq": parse_ittefaq,
+    "generic_news": parse_generic_news,
+    "shomoyeralo": parse_shomoyeralo,
+    "bd_pratidin": parse_bd_pratidin,
+    "earki": parse_earki,
     # fact-check (disabled but parsers still registered)
-    "rumorscanner":  parse_rumorscanner,
-    "factwatch":     parse_factwatch,
-    "jachai":        parse_jachai,
+    "rumorscanner": parse_rumorscanner,
+    "factwatch": parse_factwatch,
+    "jachai": parse_jachai,
     "rumorinspector": parse_rumorinspector,
-    "boombd":        parse_boombd,
+    "boombd": parse_boombd,
 }
 
 
@@ -1023,26 +1242,30 @@ PARSERS = {
 #  MAIN SCRAPE LOOP
 # =============================================================================
 
+
 def scrape(max_articles: int, start: date, end: date):
     log.info("=" * 68)
-    log.info(f"▶ SCRAPE START  {datetime.now().strftime('%Y-%m-%d %H:%M')}  "
-             f"range={start}→{end}  max={max_articles}")
+    log.info(
+        f"▶ SCRAPE START  {datetime.now().strftime('%Y-%m-%d %H:%M')}  "
+        f"range={start}→{end}  max={max_articles}"
+    )
     log.info("=" * 68)
 
-    visited      = load_visited()
-    seen_hashes  = load_seen_hashes()
-    state        = load_state()
-    collected    = []
-    total_new    = 0
-    total_skip   = 0
+    visited = load_visited()
+    seen_hashes = load_seen_hashes()
+    state = load_state()
+    collected = []
+    total_new = 0
+    total_skip = 0
     source_counts: dict[str, int] = {}
 
     # Only include active sources (skip disabled ones)
     active_sources = [s for s in SOURCES if s["label"] != "disabled"]
-    source_counts  = {s["name"]: 0 for s in active_sources}
+    source_counts = {s["name"]: 0 for s in active_sources}
 
     # ── ID counter ────────────────────────────────────────────────────────────
     _id_counter = [get_next_id()]
+
     def next_id():
         v = _id_counter[0]
         _id_counter[0] += 1
@@ -1052,10 +1275,10 @@ def scrape(max_articles: int, start: date, end: date):
     generators = [
         {
             "source": src,
-            "gen":    get_urls_for_source(src, start, end),
+            "gen": get_urls_for_source(src, start, end),
             "active": True,
             # per-source cap: use source["max"] if set, else global PER_SOURCE_MAX
-            "cap":    src.get("max", PER_SOURCE_MAX),
+            "cap": src.get("max", PER_SOURCE_MAX),
         }
         for src in active_sources
     ]
@@ -1102,7 +1325,7 @@ def scrape(max_articles: int, start: date, end: date):
             continue
 
         title = data.get("title", "").strip()
-        text  = data.get("text",  "").strip()
+        text = data.get("text", "").strip()
 
         if not title:
             continue
@@ -1127,21 +1350,23 @@ def scrape(max_articles: int, start: date, end: date):
 
         # ── Build output row ──────────────────────────────────────────────
         row = {
-            "id":           next_id(),
-            "title":        title,
-            "text":         text,
-            "source":       src["name"],
+            "id": next_id(),
+            "title": title,
+            "text": text,
+            "source": src["name"],
             "publish_date": pub_date_str,
-            "category":     data.get("category", src.get("category", "")),
-            "label":        src["label"],   # "real" or "fake"
-            "url":          url,
+            "category": data.get("category", src.get("category", "")),
+            "label": src["label"],  # "real" or "fake"
+            "url": url,
             "content_hash": chash,
         }
 
         collected.append(row)
-        total_new  += 1
+        total_new += 1
         source_counts[src["name"]] = source_counts.get(src["name"], 0) + 1
-        log.info(f"  [{total_new}/{max_articles}] ({src['label']}) [{src['name']}] {title[:60]}...")
+        log.info(
+            f"  [{total_new}/{max_articles}] ({src['label']}) [{src['name']}] {title[:60]}..."
+        )
 
         # ── Per-source cap enforcement ────────────────────────────────────────
         # Find this source's generator and deactivate if cap reached
@@ -1150,7 +1375,9 @@ def scrape(max_articles: int, start: date, end: date):
             for g in generators:
                 if g["source"] is src:
                     g["active"] = False
-                    log.info(f"  ✋ [{src['name']}] cap of {src_cap} reached — moving on")
+                    log.info(
+                        f"  ✋ [{src['name']}] cap of {src_cap} reached — moving on"
+                    )
                     break
 
         # Batch save
@@ -1170,6 +1397,7 @@ def scrape(max_articles: int, start: date, end: date):
 
     # ── Summary ────────────────────────────────────────────────────────────
     from collections import Counter
+
     label_counts: Counter = Counter()
     if os.path.exists(CSV_FILE):
         try:
@@ -1206,21 +1434,41 @@ def scrape(max_articles: int, start: date, end: date):
 #  CLI
 # =============================================================================
 
+
 def main():
-    global PER_SOURCE_MAX   # declared here so assignment below is valid
+    global PER_SOURCE_MAX  # declared here so assignment below is valid
     ap = argparse.ArgumentParser(
         description="Bangla News Dataset Scraper v4  —  real / fake (2 labels)"
     )
-    ap.add_argument("--max_articles", type=int, default=DEFAULT_MAX,
-                    help=f"Max articles per run (default {DEFAULT_MAX})")
-    ap.add_argument("--per_source", type=int, default=None,
-                    help=f"Override per-source cap for ALL sources (default: use each source's own max, fallback {PER_SOURCE_MAX})")
-    ap.add_argument("--start_date", type=str, default=str(DEFAULT_START),
-                    help=f"Start date YYYY-MM-DD (default {DEFAULT_START})")
-    ap.add_argument("--end_date", type=str, default=str(DEFAULT_END),
-                    help=f"End date YYYY-MM-DD (default today)")
-    ap.add_argument("--fresh", action="store_true",
-                    help="Delete existing CSV, visited list and state before starting")
+    ap.add_argument(
+        "--max_articles",
+        type=int,
+        default=DEFAULT_MAX,
+        help=f"Max articles per run (default {DEFAULT_MAX})",
+    )
+    ap.add_argument(
+        "--per_source",
+        type=int,
+        default=None,
+        help=f"Override per-source cap for ALL sources (default: use each source's own max, fallback {PER_SOURCE_MAX})",
+    )
+    ap.add_argument(
+        "--start_date",
+        type=str,
+        default=str(DEFAULT_START),
+        help=f"Start date YYYY-MM-DD (default {DEFAULT_START})",
+    )
+    ap.add_argument(
+        "--end_date",
+        type=str,
+        default=str(DEFAULT_END),
+        help=f"End date YYYY-MM-DD (default today)",
+    )
+    ap.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Delete existing CSV, visited list and state before starting",
+    )
     args = ap.parse_args()
 
     if args.fresh:
@@ -1238,7 +1486,7 @@ def main():
 
     try:
         start = date.fromisoformat(args.start_date)
-        end   = date.fromisoformat(args.end_date)
+        end = date.fromisoformat(args.end_date)
     except ValueError as e:
         print(f"Invalid date: {e}")
         raise SystemExit(1)
